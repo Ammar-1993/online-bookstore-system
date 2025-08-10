@@ -1,13 +1,16 @@
-
 <?php
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\HomeController;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+/*
+|--------------------------------------------------------------------------
+| Home
+|--------------------------------------------------------------------------
+*/
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
 /*
 |--------------------------------------------------------------------------
@@ -47,4 +50,3 @@ Route::middleware([
         return view('dashboard');
     })->name('dashboard');
 });
-

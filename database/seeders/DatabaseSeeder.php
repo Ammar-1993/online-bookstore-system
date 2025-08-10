@@ -12,12 +12,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            RolesAndPermissionsSeeder::class, // أدوار وصلاحيات: Admin / Seller / User
-            DemoUsersSeeder::class,           // مستخدمون تجريبيون وربط الأدوار
-            // CategorySeeder::class,
-            // PublisherSeeder::class,
-            // AuthorSeeder::class,
-            // BookSeeder::class,
+            RolesAndPermissionsSeeder::class,
+            DemoUsersSeeder::class,
+            CategorySeeder::class,
+            PublisherSeeder::class,
+            AuthorSeeder::class,
+            BookSeeder::class,
             // ... أضف Seeders إضافية هنا لاحقاً عند إنشائها
         ]);
     }
