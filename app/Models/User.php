@@ -8,24 +8,25 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
-use Laravel\Jetstream\HasTeams;
 use Laravel\Sanctum\HasApiTokens;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, Notifiable;
-
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    use HasApiTokens;
     use HasFactory;
-    use HasProfilePhoto;
-    use HasTeams;
     use Notifiable;
+    use HasProfilePhoto;
     use TwoFactorAuthenticatable;
+    use HasRoles; // ← مهم لحزمة Spatie
 
     /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
+     * اجبر Spatie على استخدام حارس "web" (مفيد إذا لديك أكثر من حارس).
+     */
+    protected string $guard_name = 'web';
+
+    /**
+     * Mass Assignable.
      */
     protected $fillable = [
         'name',
@@ -34,9 +35,7 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
-     * The attributes that should be hidden for serialization.
-     *
-     * @var array<int, string>
+     * Hidden attributes.
      */
     protected $hidden = [
         'password',
@@ -46,24 +45,17 @@ class User extends Authenticatable implements MustVerifyEmail
     ];
 
     /**
-     * The accessors to append to the model's array form.
-     *
-     * @var array<int, string>
+     * Casting.
+     */
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'password' => 'hashed',
+    ];
+
+    /**
+     * Appended accessors.
      */
     protected $appends = [
         'profile_photo_url',
     ];
-
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
 }
