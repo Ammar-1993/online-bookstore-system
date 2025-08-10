@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\{BookController,CategoryController,PublisherController,AuthorController};
 
 /*
 |--------------------------------------------------------------------------
@@ -11,6 +12,12 @@ use App\Http\Controllers\HomeController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+/* صفحات الكيان */
+Route::get('/books/{book:slug}', [BookController::class, 'show'])->name('books.show');
+Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
+Route::get('/publishers/{publisher:slug}', [PublisherController::class, 'show'])->name('publishers.show');
+Route::get('/authors/{author:slug}', [AuthorController::class, 'show'])->name('authors.show');
 
 /*
 |--------------------------------------------------------------------------
