@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
+use Laravel\Jetstream\HasTeams;          // ← مهم
 use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 
@@ -18,44 +19,22 @@ class User extends Authenticatable implements MustVerifyEmail
     use Notifiable;
     use HasProfilePhoto;
     use TwoFactorAuthenticatable;
-    use HasRoles; // ← مهم لحزمة Spatie
+    use HasTeams;                         // ← مهم
+    use HasRoles;
 
-    /**
-     * اجبر Spatie على استخدام حارس "web" (مفيد إذا لديك أكثر من حارس).
-     */
     protected string $guard_name = 'web';
 
-    /**
-     * Mass Assignable.
-     */
-    protected $fillable = [
-        'name',
-        'email',
-        'password',
-    ];
+    protected $fillable = ['name','email','password'];
 
-    /**
-     * Hidden attributes.
-     */
     protected $hidden = [
-        'password',
-        'remember_token',
-        'two_factor_recovery_codes',
-        'two_factor_secret',
+        'password','remember_token',
+        'two_factor_recovery_codes','two_factor_secret',
     ];
 
-    /**
-     * Casting.
-     */
     protected $casts = [
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
 
-    /**
-     * Appended accessors.
-     */
-    protected $appends = [
-        'profile_photo_url',
-    ];
+    protected $appends = ['profile_photo_url'];
 }
