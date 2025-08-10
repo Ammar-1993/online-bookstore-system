@@ -11,4 +11,10 @@ class Publisher extends Model
     protected $fillable = ['name','slug','website','logo_path'];
 
     public function books() { return $this->hasMany(Book::class); }
+
+    public function getRouteKeyName(): string
+{
+    return 'slug';
+}
+
 }

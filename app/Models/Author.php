@@ -8,7 +8,16 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Author extends Model
 {
     use HasFactory;
-    protected $fillable = ['name','slug','bio','photo_path'];
+    protected $fillable = ['name', 'slug', 'bio', 'photo_path'];
 
-    public function books() { return $this->belongsToMany(Book::class); } // author_book
+    public function books()
+    {
+        return $this->belongsToMany(Book::class);
+    } // author_book
+
+    public function getRouteKeyName(): string
+    {
+        return 'slug';
+    }
+
 }

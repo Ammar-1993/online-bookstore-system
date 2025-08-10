@@ -22,4 +22,15 @@ class Book extends Model
     public function authors()   { return $this->belongsToMany(Author::class); } // author_book
     public function reviews()   { return $this->hasMany(Review::class); }
     public function seller()    { return $this->belongsTo(User::class, 'seller_id'); }
+
+    public function getRouteKeyName(): string
+{
+    return 'slug';
 }
+    // public function getCoverImageUrlAttribute(): string
+    // {
+    //     return asset('storage/' . $this->cover_image_path);
+    // }
+}
+
+

@@ -3,8 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use App\Http\Controllers\HomeController;
-use App\Http\Controllers\{BookController,CategoryController,PublisherController,AuthorController};
+
+use App\Http\Controllers\{HomeController,BookController,CategoryController,PublisherController,AuthorController};
+
 
 /*
 |--------------------------------------------------------------------------
@@ -12,6 +13,10 @@ use App\Http\Controllers\{BookController,CategoryController,PublisherController,
 |--------------------------------------------------------------------------
 */
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// صفحة تفاصيل الكتاب باستخدام الـ slug
+Route::get('/books/{book:slug}', [BookController::class, 'show'])->name('books.show');
+
 
 /* صفحات الكيان */
 Route::get('/books/{book:slug}', [BookController::class, 'show'])->name('books.show');

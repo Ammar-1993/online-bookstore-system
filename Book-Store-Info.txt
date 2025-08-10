@@ -8,6 +8,8 @@ cd /mnt/d/projects
 
 ./vendor/bin/sail down
 ./vendor/bin/sail up -d
+./vendor/bin/sail npm run dev
+
 http://localhost:8080/
 http://localhost:8025/
 
