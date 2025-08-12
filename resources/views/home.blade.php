@@ -36,15 +36,19 @@
         @if($books->count() === 0)
             <p class="text-gray-600">لا توجد نتائج مطابقة.</p>
         @else
-            <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 justify-items-stretch">
                 @foreach($books as $book)
                     <x-book-card :book="$book" />
                 @endforeach
+
+                <div class="mt-6">
+                    {{ $books->links() }}
+                </div>
             </div>
 
-            <div class="mt-6">
-                {{ $books->links() }}
-            </div>
+
         @endif
     </main>
 </body>

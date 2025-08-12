@@ -22,7 +22,7 @@ class HomeController extends Controller
         }
 
         $books = $query->latest('published_at')
-            ->paginate(24)
+            ->paginate(10) // Adjusted to 6 for consistency with admin books index
             ->withQueryString();
 
         return view('home', compact('books'));
