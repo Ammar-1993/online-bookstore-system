@@ -3,62 +3,113 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\AuthorRequest;
 use App\Models\Author;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class AuthorController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-        $s = $request->get('s');
-        $authors = Author::when($s, fn($q)=>$q->where('name','like',"%{$s}%"))
-            ->latest()->paginate(15)->withQueryString();
+        $q = trim((string) $request->get('q',''));
 
-        return view('admin.authors.index', compact('authors'));
+        $authors = Author::query()
+            ->when($q !== '', function (Builder $b) use ($q) {
+                $b->where(fn($x) =>
+                    $x->where('name','like',"%{$q}%")
+                      ->orWhere('slug','like',"%{$q}%")
+                );
+            })
+            ->withCount('books')
+            ->latest('id')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('admin.authors.index', compact('authors','q'));
     }
 
-    public function create()
+    public function create(): View
     {
-        return view('admin.authors.create');
+        $author = new Author();
+        return view('admin.authors.create', compact('author'));
     }
 
-    public function store(Request $request)
+    public function store(AuthorRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'name' => ['required','string','max:120','unique:authors,name'],
-            'slug' => ['nullable','string','max:150','unique:authors,slug'],
-            'bio'  => ['nullable','string'],
-        ]);
-        $data['slug'] = Str::slug($data['slug'] ?: $data['name']);
-        Author::create($data);
+        $data = $request->validated();
+        $data['slug'] = $this->uniqueSlug($data['slug'] ?? null, $data['name']);
 
-        return redirect()->route('admin.authors.index')->with('success', 'تمت الإضافة');
+        if ($request->hasFile('avatar')) {
+            $data['avatar_path'] = $request->file('avatar')->store('authors', 'public');
+        }
+
+        $author = Author::create($data);
+
+        return redirect()
+            ->route('admin.authors.index')
+            ->with('success', "تم إنشاء المؤلف «{$author->name}» بنجاح.");
     }
 
-    public function edit(Author $author)
+    public function edit(Author $author): View
     {
         return view('admin.authors.edit', compact('author'));
     }
 
-    public function update(Request $request, Author $author)
+    public function update(AuthorRequest $request, Author $author): RedirectResponse
     {
-        $data = $request->validate([
-            'name' => ['required','string','max:120','unique:authors,name,'.$author->id],
-            'slug' => ['nullable','string','max:150','unique:authors,slug,'.$author->id],
-            'bio'  => ['nullable','string'],
-        ]);
-        if (!empty($data['slug'])) $data['slug'] = Str::slug($data['slug']);
+        $data = $request->validated();
+        $data['slug'] = $this->uniqueSlug($data['slug'] ?? $author->slug, $data['name'], $author->id);
+
+        if ($request->hasFile('avatar')) {
+            if ($author->avatar_path) {
+                Storage::disk('public')->delete($author->avatar_path);
+            }
+            $data['avatar_path'] = $request->file('avatar')->store('authors', 'public');
+        }
+
         $author->update($data);
 
-        return redirect()->route('admin.authors.index')->with('success', 'تم التحديث');
+        return redirect()
+            ->route('admin.authors.index')
+            ->with('success', "تم تحديث المؤلف «{$author->name}» بنجاح.");
     }
 
-    public function destroy(Author $author)
+    public function destroy(Author $author): RedirectResponse
     {
-        // لو تحب تمنع الحذف في حال مرتبط بكتب:
-        // if ($author->books()->exists()) return back()->with('error','مربوط بكتب.');
+        // منع الحذف إذا لديه كتب
+        if ($author->books()->exists()) {
+            return back()->with('error', 'لا يمكن حذف المؤلف لوجود كتب مرتبطة به.');
+        }
+
+        if ($author->avatar_path) {
+            Storage::disk('public')->delete($author->avatar_path);
+        }
+
+        $name = $author->name;
         $author->delete();
-        return back()->with('success', 'تم الحذف');
+
+        return redirect()
+            ->route('admin.authors.index')
+            ->with('success', "تم حذف المؤلف «{$name}» بنجاح.");
+    }
+
+    private function uniqueSlug(?string $slug, string $name, ?int $ignoreId = null): string
+    {
+        $base = Str::slug($slug ?: $name, '-', 'ar') ?: Str::slug($name) ?: 'author';
+        $candidate = $base; $i = 2;
+
+        while (
+            Author::when($ignoreId, fn($q)=>$q->where('id','!=',$ignoreId))
+                  ->where('slug',$candidate)->exists()
+        ) {
+            $candidate = "{$base}-{$i}";
+            $i++;
+        }
+        return $candidate;
     }
 }
