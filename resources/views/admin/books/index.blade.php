@@ -11,9 +11,6 @@
   </form>
 </div>
 
-@if(session('success'))
-  <div class="mb-3 p-3 bg-green-50 text-green-700 rounded">{{ session('success') }}</div>
-@endif
 
 <div class="overflow-x-auto bg-white rounded shadow">
   <table class="min-w-full text-sm">

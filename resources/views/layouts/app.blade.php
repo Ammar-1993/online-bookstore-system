@@ -34,6 +34,7 @@
 
             <!-- Page Content -->
             <main>
+                <x-flash-stack />
                 {{ $slot }}
             </main>
         </div>

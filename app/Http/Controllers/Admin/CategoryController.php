@@ -3,60 +3,136 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\CategoryRequest;
 use App\Models\Category;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
-    public function index(Request $request)
+    public function index(Request $request): View
     {
-        $this->authorize('role', 'Admin'); // تأكيد عبر الميدلوير أيضًا
-        $s = $request->get('s');
-        $categories = Category::when($s, fn($q)=>$q->where('name','like',"%{$s}%"))
-            ->latest()->paginate(15)->withQueryString();
+        $q = trim((string) $request->get('q', ''));
 
-        return view('admin.categories.index', compact('categories'));
+        $categories = Category::query()
+            ->when($q !== '', function (Builder $builder) use ($q) {
+                $builder->where(fn ($x) =>
+                    $x->where('name', 'like', "%{$q}%")
+                      ->orWhere('slug', 'like', "%{$q}%")
+                );
+            })
+            ->withCount('books')
+            ->latest('id')
+            ->paginate(12)
+            ->withQueryString();
+
+        return view('admin.categories.index', compact('categories', 'q'));
     }
 
-    public function create()
+    public function create(): View
     {
-        return view('admin.categories.create');
+        $category = new Category();
+
+        return view('admin.categories.create', compact('category'));
     }
 
-    public function store(Request $request)
+    public function store(CategoryRequest $request): RedirectResponse
     {
-        $data = $request->validate([
-            'name' => ['required','string','max:100','unique:categories,name'],
-            'slug' => ['nullable','string','max:150','unique:categories,slug'],
-        ]);
-        $data['slug'] = Str::slug($data['slug'] ?: $data['name']);
-        Category::create($data);
+        $data = $request->validated();
 
-        return redirect()->route('admin.categories.index')->with('success', 'تمت الإضافة');
+        // توليد slug فريد إن لم يُرسل أو كان مكررًا
+        $data['slug'] = $this->uniqueSlug($data['slug'] ?? null, $data['name']);
+
+        // رفع صورة (اختياري) إذا كان العمود موجودًا
+        if (Schema::hasColumn('categories', 'image_path') && $request->hasFile('image')) {
+            $data['image_path'] = $request->file('image')->store('categories', 'public');
+        }
+
+        $category = Category::create($data);
+
+        return redirect()
+            ->route('admin.categories.index')
+            ->with('success', "تم إنشاء التصنيف «{$category->name}» بنجاح.");
     }
 
-    public function edit(Category $category)
+    public function edit(Category $category): View
     {
         return view('admin.categories.edit', compact('category'));
     }
 
-    public function update(Request $request, Category $category)
+    public function update(CategoryRequest $request, Category $category): RedirectResponse
     {
-        $data = $request->validate([
-            'name' => ['required','string','max:100','unique:categories,name,'.$category->id],
-            'slug' => ['nullable','string','max:150','unique:categories,slug,'.$category->id],
-        ]);
-        if (!empty($data['slug'])) $data['slug'] = Str::slug($data['slug']);
+        $data = $request->validated();
+
+        // تحديث slug مع ضمان فريدانيته (مع استثناء السجل الحالي)
+        $data['slug'] = $this->uniqueSlug($data['slug'] ?? $category->slug, $data['name'], $category->id);
+
+        // استبدال الصورة إن أُرسلت (وعمود الصورة موجود)
+        if (Schema::hasColumn('categories', 'image_path') && $request->hasFile('image')) {
+            if ($category->image_path) {
+                Storage::disk('public')->delete($category->image_path);
+            }
+            $data['image_path'] = $request->file('image')->store('categories', 'public');
+        }
+
         $category->update($data);
 
-        return redirect()->route('admin.categories.index')->with('success', 'تم التحديث');
+        return redirect()
+            ->route('admin.categories.index')
+            ->with('success', "تم تحديث التصنيف «{$category->name}» بنجاح.");
     }
 
-    public function destroy(Category $category)
+    public function destroy(Category $category): RedirectResponse
     {
-        abort_unless(auth()->user()->hasRole('Admin'), 403);
+        // منع الحذف إذا عليه كتب
+        if ($category->books()->exists()) {
+            return back()->with('error', 'لا يمكن حذف التصنيف لوجود كتب مرتبطة به.');
+        }
+
+        // ومنع الحذف إن كان لديه تصنيفات فرعية
+        if ($category->children()->exists()) {
+            return back()->with('error', 'لا يمكن حذف التصنيف لوجود تصنيفات فرعية مرتبطة به.');
+        }
+
+        // حذف الصورة إن وُجدت وكان العمود موجودًا
+        if (Schema::hasColumn('categories', 'image_path') && $category->image_path) {
+            Storage::disk('public')->delete($category->image_path);
+        }
+
+        $name = $category->name;
         $category->delete();
-        return back()->with('success', 'تم الحذف');
+
+        return redirect()
+            ->route('admin.categories.index')
+            ->with('success', "تم حذف التصنيف «{$name}» بنجاح.");
+    }
+
+    /**
+     * توليد slug فريد. إذا أُعطي ignoreId يتم تجاهله عند التحقق (لتحديث السجل الحالي).
+     */
+    private function uniqueSlug(?string $slug, string $name, ?int $ignoreId = null): string
+    {
+        // توليد أساس للـ slug (يدعم العربية قدر الإمكان)، مع fallback
+        $base = Str::slug($slug ?: $name, '-', 'ar') ?: Str::slug($name);
+        $base = $base ?: 'category';
+
+        $candidate = $base;
+        $i = 2;
+
+        while (
+            Category::when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+                ->where('slug', $candidate)
+                ->exists()
+        ) {
+            $candidate = "{$base}-{$i}";
+            $i++;
+        }
+
+        return $candidate;
     }
 }

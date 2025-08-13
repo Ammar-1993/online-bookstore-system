@@ -1,13 +1,3 @@
-<!-- @if ($errors->any())
-  <div class="mb-3 p-3 bg-rose-50 text-rose-700 rounded">
-    <ul class="list-disc pr-5">
-      @foreach ($errors->all() as $error)
-        <li>{{ $error }}</li>
-      @endforeach
-    </ul>
-  </div>
-@endif -->
-
 
 @extends('admin.layouts.app')
 @section('title','إضافة كتاب')
