@@ -7,27 +7,31 @@ use Illuminate\Validation\Rule;
 
 class UserUpdateRequest extends FormRequest
 {
-    public function authorize(): bool { return true; }
+    public function authorize(): bool
+    {
+        return true; // محمي عبر Middleware role:Admin على مستوى الراوتر
+    }
 
     public function rules(): array
     {
-        $userId = $this->route('user')?->id;
+        $id = $this->route('user')->id ?? null;
 
         return [
-            'name'  => ['required','string','max:255'],
-            'email' => [
-                'required','email','max:255',
-                Rule::unique('users','email')->ignore($userId),
-            ],
-            // تعديل كلمة المرور اختياري
-            'password' => ['nullable','string','min:8','confirmed'],
+            'name'                  => ['required','string','max:255'],
+            'email'                 => ['required','email','max:255', Rule::unique('users','email')->ignore($id)],
+            'password'              => ['nullable','confirmed','min:8'],
+            'roles'                 => ['required','array','min:1'],
+            'roles.*'               => ['string','in:Admin,Seller'],
+        ];
+    }
 
-            // أدوار Spatie (أسماء الأدوار)
-            'roles' => ['nullable','array'],
-            'roles.*' => ['string'],
-
-            // تعليمات إضافية
-            'mark_verified' => ['sometimes','boolean'],   // وضع علامة تحقق للبريد
+    public function attributes(): array
+    {
+        return [
+            'name'  => 'الاسم',
+            'email' => 'البريد',
+            'password' => 'كلمة المرور',
+            'roles' => 'الأدوار',
         ];
     }
 }

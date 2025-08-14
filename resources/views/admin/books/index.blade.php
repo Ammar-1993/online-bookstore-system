@@ -1,6 +1,9 @@
 @extends('admin.layouts.app')
 @section('title','الكتب')
 
+<div class="p-4 bg-indigo-100 text-indigo-800 rounded">Tailwind works 🎉</div>
+
+
 @section('content')
 <div class="flex items-center justify-between mb-4">
   <a href="{{ route('admin.books.create') }}" class="px-3 py-2 rounded bg-indigo-600 text-white">+ إضافة كتاب</a>
