@@ -15,15 +15,7 @@
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
       <a href="{{ route('admin.dashboard') }}" class="font-bold">لوحة التحكم</a>
 
-      <!-- <nav class="text-sm hidden md:flex gap-4">
-        <a href="{{ route('admin.books.index') }}">الكتب</a>
-        @role('Admin')
-        <a href="{{ route('admin.categories.index') }}">التصنيفات</a>
-        <a href="{{ route('admin.publishers.index') }}">الناشرون</a>
-        <a href="{{ route('admin.authors.index') }}">المؤلفون</a>
-        <a href="{{ route('admin.users.index') }}">المستخدمون</a>
-        @endrole
-      </nav> -->
+
 
       <nav class="text-sm hidden md:flex gap-4">
         <a href="{{ route('admin.dashboard') }}">لوحة التحكم</a>
@@ -32,7 +24,15 @@
         <a href="{{ route('admin.publishers.index') }}">الناشرون</a>
         <a href="{{ route('admin.authors.index') }}">المؤلفون</a>
         <a href="{{ route('admin.users.index') }}">المستخدمون</a>
+        <a href="{{ route('admin.reviews.index') }}">المراجعات</a>
+        @role('Seller')
+        <a href="{{ route('admin.reviews.index') }}">مراجعات كتبي</a>
         @endrole
+
+        @endrole
+
+
+
 
         {{-- يظهر للجميع داخل لوحة التحكم لكن يختلف التحكم بالكتاب عبر Policy --}}
         <a href="{{ route('admin.books.index') }}">الكتب</a>

@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
 
 // الواجهة العامة
 use App\Http\Controllers\{
@@ -31,18 +33,21 @@ use App\Http\Controllers\Admin\{
 */
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/books/{book:slug}', [BookController::class, 'show'])
-    ->name('books.show');
+Route::get('/books/{book:slug}', [BookController::class, 'show'])->name('books.show');
+Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
+Route::get('/publishers/{publisher:slug}', [PublisherController::class, 'show'])->name('publishers.show');
+Route::get('/authors/{author:slug}', [AuthorController::class, 'show'])->name('authors.show');
 
-Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])
-    ->name('categories.show');
-
-Route::get('/publishers/{publisher:slug}', [PublisherController::class, 'show'])
-    ->name('publishers.show');
-
-Route::get('/authors/{author:slug}', [AuthorController::class, 'show'])
-    ->name('authors.show');
-
+/*
+|--------------------------------------------------------------------------
+| مراجعات الكتب (مستخدم مسجّل + بريد مُفعّل)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
+    Route::post  ('/books/{book:slug}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::put   ('/reviews/{review}',          [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}',          [ReviewController::class, 'destroy'])->name('reviews.destroy');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -51,8 +56,7 @@ Route::get('/authors/{author:slug}', [AuthorController::class, 'show'])
 | مفعّلة للمستخدم المسجّل فقط.
 */
 Route::middleware('auth')->group(function () {
-    Route::get('/email/verify', fn () => view('auth.verify-email'))
-        ->name('verification.notice');
+    Route::get('/email/verify', fn() => view('auth.verify-email'))->name('verification.notice');
 
     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
         $request->fulfill(); // يحدّث verified_at
@@ -65,7 +69,6 @@ Route::middleware('auth')->group(function () {
     })->middleware(['throttle:6,1'])->name('verification.send');
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | لوحة التحكم / الإدارة
@@ -77,25 +80,27 @@ Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'role:Admin|Seller'])
     ->group(function () {
-
         // الصفحة الرئيسية للوحة التحكم
         Route::get('/', DashboardController::class)->name('dashboard');
 
-        // كتب (Seller يرى/يدير كتبه فقط عبر الـ Policy؛ Admin يرى الكل)
+        // كتب (Seller يدير كتبه فقط عبر الـ Policy؛ Admin يرى الكل)
         Route::resource('books', AdminBookController::class);
+
+        // إدارة المراجعات: Admin و Seller (Seller يرى مراجعات كتبه فقط - مفلترة في الكنترولر/Policy)
+        Route::get   ('/reviews',                 [AdminReviewController::class, 'index'])->name('reviews.index');
+        Route::patch ('/reviews/{review}/toggle', [AdminReviewController::class, 'toggle'])->name('reviews.toggle');
+        Route::delete('/reviews/{review}',        [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
 
         // موارد خاصة بالمشرف Admin فقط
         Route::middleware('role:Admin')->group(function () {
-            Route::resource('categories', AdminCategoryController::class)->except('show');
-            Route::resource('publishers', AdminPublisherController::class)->except('show');
-            Route::resource('authors',    AdminAuthorController::class)->except('show');
+            Route::resource('categories',  AdminCategoryController::class)->except('show');
+            Route::resource('publishers',  AdminPublisherController::class)->except('show');
+            Route::resource('authors',     AdminAuthorController::class)->except('show');
 
-            // إدارة المستخدمين (لا إنشاء من اللوحة حالياً)
-            Route::resource('users', AdminUserController::class)
-                ->except(['show', 'create', 'store']);
+            // إدارة المستخدمين (لا إنشاء من اللوحة حاليًا)
+            Route::resource('users', AdminUserController::class)->except(['show', 'create', 'store']);
         });
     });
-
 
 /*
 |--------------------------------------------------------------------------
@@ -103,7 +108,7 @@ Route::prefix('admin')
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
-    ->get('/dashboard', fn () => view('dashboard'))
+    ->get('/dashboard', fn() => view('dashboard'))
     ->name('dashboard');
 
 /*
@@ -111,4 +116,4 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 | Fallback (اختياري)
 |--------------------------------------------------------------------------
 */
-Route::fallback(fn () => abort(404));
+Route::fallback(fn() => abort(404));

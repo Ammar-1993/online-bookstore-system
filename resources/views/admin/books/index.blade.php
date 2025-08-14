@@ -1,7 +1,6 @@
 @extends('admin.layouts.app')
 @section('title','الكتب')
 
-<div class="p-4 bg-indigo-100 text-indigo-800 rounded">Tailwind works 🎉</div>
 
 
 @section('content')
