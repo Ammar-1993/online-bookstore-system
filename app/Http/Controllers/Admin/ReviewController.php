@@ -28,7 +28,7 @@ class ReviewController extends Controller
                   ->orWhereHas('user', fn($uu) => $uu->where('name', 'like', "%{$q}%"));
             })
             ->latest()
-            ->paginate(20)
+            ->paginate(12)
             ->withQueryString();
 
         return view('admin.reviews.index', compact('reviews','filter','q'));

@@ -16,7 +16,7 @@ class AuthorController extends Controller
             $q->where('title','like',"%{$s}%");
         }
 
-        $books = $q->latest('published_at')->paginate(24)->withQueryString();
+        $books = $q->latest('published_at')->paginate(12)->withQueryString();
 
         return view('authors.show', compact('author','books'));
     }

@@ -24,7 +24,9 @@
         <x-book-card :book="$book" />
       @endforeach
     </div>
-    <div class="mt-6">{{ $books->links() }}</div>
+    <div class="mt-6">
+      <!-- {{ $books->links() }} -->
+      {{ $books->onEachSide(1)->links('vendor.pagination.tailwind-rtl') }}  </div>
   @else
     <p class="text-gray-600">لا توجد كتب في هذا التصنيف.</p>
   @endif
