@@ -12,7 +12,12 @@ class AuthServiceProvider extends ServiceProvider
     protected $policies = [
         Book::class => BookPolicy::class,
         \App\Models\Review::class => \App\Policies\ReviewPolicy::class,
-        
+
+        \App\Models\Order::class => \App\Policies\OrderPolicy::class,
+       
+
+
+
         // أضف سياسات أخرى لاحقًا إن وجدت
     ];
 
@@ -21,7 +26,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerPolicies();
 
         // Gate عام اختياري إن فضّلت استخدامه بدل role:
-        Gate::define('access-admin', fn($user) => $user->hasAnyRole(['Admin','Seller']));
+        Gate::define('access-admin', fn($user) => $user->hasAnyRole(['Admin', 'Seller']));
         // وقتها بإمكانك في الراوت استخدام 'can:access-admin' بدل 'role:Admin|Seller'
     }
 }

@@ -3,9 +3,14 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-
 use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\PaymentController;
+
+
+
 
 // الواجهة العامة
 use App\Http\Controllers\{
@@ -13,7 +18,8 @@ use App\Http\Controllers\{
     BookController,
     CategoryController,
     PublisherController,
-    AuthorController
+    AuthorController,
+    OrderController
 };
 
 // لوحة التحكم (Admin)
@@ -23,7 +29,8 @@ use App\Http\Controllers\Admin\{
     CategoryController as AdminCategoryController,
     PublisherController as AdminPublisherController,
     AuthorController as AdminAuthorController,
-    UserController as AdminUserController
+    UserController as AdminUserController,
+    OrderController as AdminOrderController
 };
 
 /*
@@ -38,15 +45,53 @@ Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->
 Route::get('/publishers/{publisher:slug}', [PublisherController::class, 'show'])->name('publishers.show');
 Route::get('/authors/{author:slug}', [AuthorController::class, 'show'])->name('authors.show');
 
+
+
+
+// Cart
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/add/{book:slug}', [CartController::class, 'add'])->name('cart.add');
+Route::patch('/cart/{book:slug}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/cart/{book:slug}', [CartController::class, 'remove'])->name('cart.remove');
+Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
+
+
+
+// Checkout (يتطلب تسجيل الدخول لأن orders.user_id غير فارغ)
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
+    ->group(function () {
+        Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
+        Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+        Route::get('/checkout/thanks', [CheckoutController::class, 'thankyou'])->name('checkout.thankyou');
+
+        // طلباتي (عميل)
+        Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+        Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
+
+
+        // تأكيد دفع (نسخة Mock للتطوير)
+        Route::get('/payments/mock/{order}/success', [PaymentController::class, 'mockSuccess'])
+            ->name('payments.mock.success');
+
+        // إلغاء طلب
+        Route::post('/orders/{order}/cancel', [PaymentController::class, 'cancel'])
+            ->name('orders.cancel');
+
+    });
+
+
+
+
 /*
 |--------------------------------------------------------------------------
 | مراجعات الكتب (مستخدم مسجّل + بريد مُفعّل)
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
-    Route::post  ('/books/{book:slug}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
-    Route::put   ('/reviews/{review}',          [ReviewController::class, 'update'])->name('reviews.update');
-    Route::delete('/reviews/{review}',          [ReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::post('/books/{book:slug}/reviews', [ReviewController::class, 'store'])->name('reviews.store');
+    Route::put('/reviews/{review}', [ReviewController::class, 'update'])->name('reviews.update');
+    Route::delete('/reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
 });
 
 /*
@@ -87,18 +132,20 @@ Route::prefix('admin')
         Route::resource('books', AdminBookController::class);
 
         // إدارة المراجعات: Admin و Seller (Seller يرى مراجعات كتبه فقط - مفلترة في الكنترولر/Policy)
-        Route::get   ('/reviews',                 [AdminReviewController::class, 'index'])->name('reviews.index');
-        Route::patch ('/reviews/{review}/toggle', [AdminReviewController::class, 'toggle'])->name('reviews.toggle');
-        Route::delete('/reviews/{review}',        [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
+        Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
+        Route::patch('/reviews/{review}/toggle', [AdminReviewController::class, 'toggle'])->name('reviews.toggle');
+        Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
 
         // موارد خاصة بالمشرف Admin فقط
         Route::middleware('role:Admin')->group(function () {
-            Route::resource('categories',  AdminCategoryController::class)->except('show');
-            Route::resource('publishers',  AdminPublisherController::class)->except('show');
-            Route::resource('authors',     AdminAuthorController::class)->except('show');
+            Route::resource('categories', AdminCategoryController::class)->except('show');
+            Route::resource('publishers', AdminPublisherController::class)->except('show');
+            Route::resource('authors', AdminAuthorController::class)->except('show');
 
             // إدارة المستخدمين (لا إنشاء من اللوحة حاليًا)
             Route::resource('users', AdminUserController::class)->except(['show', 'create', 'store']);
+
+            Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
         });
     });
 

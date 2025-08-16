@@ -31,11 +31,23 @@
                     <a href="{{ route('login') }}" class="hover:text-indigo-600">دخول</a>
                     <a href="{{ route('register') }}" class="hover:text-indigo-600">تسجيل</a>
                 @endauth
+                <a href="{{ route('cart.index') }}" class="relative hover:text-indigo-600">
+                    العربة
+                    <span
+                        class="absolute -top-2 -left-3 text-xs bg-indigo-600 text-white rounded px-1">{{ $cartCount ?? 0 }}</span>
+                </a>
+
             </nav>
         </div>
     </header>
 
+    <!-- Flash messages -->
+    <x-flash-stack duration="10000" />
+
     <main class="container mx-auto px-4 py-8">
+
+
+
         {{-- شريط علوي داخل الصفحة (نفس فكرة صفحة المؤلف) --}}
         <div class="flex flex-col sm:flex-row items-center justify-between gap-3 mb-6">
             <h2 class="text-lg font-semibold">
