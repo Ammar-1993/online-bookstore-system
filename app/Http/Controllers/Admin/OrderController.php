@@ -7,6 +7,8 @@ use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use App\Notifications\OrderPaidNotification;
+use App\Notifications\OrderCancelledNotification;
 
 class OrderController extends Controller
 {
@@ -21,7 +23,6 @@ class OrderController extends Controller
 
     public function show(Order $order): View
     {
-        // OrderController@show و @invoice
         $this->authorize('view', $order);
         $order->load(['items.book', 'user']);
         return view('admin.orders.show', compact('order'));
@@ -37,14 +38,22 @@ class OrderController extends Controller
         $targetStatus = $data['status'];
         $targetPayment = $data['payment_status'];
 
+        $wasPaid = ($order->payment_status === 'paid');
+
         if ($targetPayment === 'paid' && $order->payment_status !== 'paid') {
-            $order->markPaid(); // يحدّث status => processing
+            $order->markPaid();
+            $order->user?->notify(new OrderPaidNotification($order));
         } elseif ($targetPayment === 'refunded' && $order->payment_status !== 'refunded') {
-            $order->cancelAndRestock(); // إرجاع مخزون + cancel/refund
+            $order->cancelAndRestock();
+            $order->user?->notify(new OrderCancelledNotification($order));
         } else {
             if ($order->status !== $targetStatus) {
                 $order->status = $targetStatus;
                 $order->save();
+
+                if ($targetStatus === 'cancelled' && ! $wasPaid) {
+                    $order->user?->notify(new OrderCancelledNotification($order));
+                }
             }
         }
 

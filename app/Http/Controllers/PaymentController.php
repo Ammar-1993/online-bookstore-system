@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Log;
+use App\Notifications\OrderPaidNotification;
+use App\Notifications\OrderCancelledNotification;
 
 class PaymentController extends Controller
 {
@@ -25,7 +27,8 @@ class PaymentController extends Controller
                 ->with('error', $e->getMessage());
         }
 
-        // optional($order->user)->notify(new \App\Notifications\OrderPaidNotification($order));
+        $order->user?->notify(new OrderPaidNotification($order));
+
         return redirect()->route('orders.show', $order)->with('success', 'تم الدفع بنجاح!');
     }
 
@@ -38,7 +41,9 @@ class PaymentController extends Controller
         }
 
         $order->cancelAndRestock();
-        // optional($order->user)->notify(new \App\Notifications\OrderCancelledNotification($order));
+
+        $order->user?->notify(new OrderCancelledNotification($order));
+
         return redirect()->route('orders.show', $order)->with('success', 'تم إلغاء الطلب وإرجاع المخزون (إن وُجد).');
     }
 }
