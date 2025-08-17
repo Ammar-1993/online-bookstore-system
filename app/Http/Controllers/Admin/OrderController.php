@@ -9,6 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 use App\Notifications\OrderPaidNotification;
 use App\Notifications\OrderCancelledNotification;
+use App\Notifications\OrderStatusUpdatedNotification;
 
 class OrderController extends Controller
 {
@@ -38,7 +39,8 @@ class OrderController extends Controller
         $targetStatus = $data['status'];
         $targetPayment = $data['payment_status'];
 
-        $wasPaid = ($order->payment_status === 'paid');
+        $oldStatus = (string) $order->status;
+        $wasPaid   = ($order->payment_status === 'paid');
 
         if ($targetPayment === 'paid' && $order->payment_status !== 'paid') {
             $order->markPaid();
@@ -53,6 +55,10 @@ class OrderController extends Controller
 
                 if ($targetStatus === 'cancelled' && ! $wasPaid) {
                     $order->user?->notify((new OrderCancelledNotification($order))->locale('ar'));
+                }
+
+                if (in_array($targetStatus, ['processing', 'shipped'], true)) {
+                    $order->user?->notify((new OrderStatusUpdatedNotification($order, $oldStatus, $targetStatus))->locale('ar'));
                 }
             }
         }
