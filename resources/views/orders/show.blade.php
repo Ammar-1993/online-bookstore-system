@@ -69,6 +69,9 @@
                 </form>
             @endif
 
+            <a href="{{ route('payments.stripe.pay', $order) }}" class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700"> الدفع ببطاقة (Stripe اختبار)</a>
+
+
             <a href="{{ route('orders.invoice', $order) }}"
                 class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">عرض الفاتورة</a>
             <a href="{{ route('orders.invoice.pdf', $order) }}"
