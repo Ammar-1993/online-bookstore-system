@@ -42,17 +42,17 @@ class OrderController extends Controller
 
         if ($targetPayment === 'paid' && $order->payment_status !== 'paid') {
             $order->markPaid();
-            $order->user?->notify(new OrderPaidNotification($order));
-        } elseif ($targetPayment === 'refunded' && $order->payment_status !== 'refunded') {
+            $order->user?->notify((new OrderPaidNotification($order))->locale('ar'));
+        } elseif ($targetPayment === 'refunded' && $order->payment_status === 'paid') {
             $order->cancelAndRestock();
-            $order->user?->notify(new OrderCancelledNotification($order));
+            $order->user?->notify((new OrderCancelledNotification($order))->locale('ar'));
         } else {
             if ($order->status !== $targetStatus) {
                 $order->status = $targetStatus;
                 $order->save();
 
                 if ($targetStatus === 'cancelled' && ! $wasPaid) {
-                    $order->user?->notify(new OrderCancelledNotification($order));
+                    $order->user?->notify((new OrderCancelledNotification($order))->locale('ar'));
                 }
             }
         }

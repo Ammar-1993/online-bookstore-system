@@ -7,7 +7,9 @@
   <div class="bg-white shadow rounded-2xl p-4">
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-xl font-bold">الطلب #{{ $order->id }}</h1>
+        <h1 class="text-xl font-bold">
+          الطلب {{ method_exists($order,'getNumberAttribute') ? $order->number : ('#'.$order->id) }}
+        </h1>
         <div class="text-gray-600 text-sm">
           {{ $order->user->name ?? '—' }} · {{ $order->user->email ?? '' }}
         </div>

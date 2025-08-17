@@ -68,6 +68,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
         Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
+        Route::get('/orders/{order}/invoice.pdf', [OrderController::class, 'invoicePdf'])
+            ->name('orders.invoice.pdf');
+
 
 
         // تأكيد دفع (نسخة Mock للتطوير)
@@ -112,6 +115,8 @@ Route::middleware('auth')->group(function () {
         $request->user()->sendEmailVerificationNotification();
         return back()->with('status', 'verification-link-sent');
     })->middleware(['throttle:6,1'])->name('verification.send');
+
+
 });
 
 /*

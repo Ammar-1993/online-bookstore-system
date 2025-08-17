@@ -22,7 +22,8 @@
                     <div class="py-3 flex items-center justify-between">
                         <div>
                             <div class="font-medium">{{ $item->book->title ?? 'كتاب' }}</div>
-                            <div class="text-xs text-gray-500">الكمية: {{ $item->qty }} · السعر: {{ number_format($item->unit_price,2) }}</div>
+                            <div class="text-xs text-gray-500">الكمية: {{ $item->qty }} · السعر:
+                                {{ number_format($item->unit_price, 2) }}</div>
                         </div>
                         <div class="font-semibold">{{ number_format($item->total_price, 2) }}</div>
                     </div>
@@ -31,7 +32,7 @@
             <div class="mt-4 text-right font-bold">الإجمالي: {{ number_format($order->computedTotal(), 2) }}</div>
         </div>
 
-        <div class="bg-white shadow rounded-2xl p-4 flex flex-wrap gap-2">
+        <!-- <div class="bg-white shadow rounded-2xl p-4 flex flex-wrap gap-2">
             @if($order->isPayable())
                 {{-- ✅ اسم الراوت الصحيح من ملف routes عندك: payments.mock.success (جمع) --}}
                 <a href="{{ route('payments.mock.success', $order) }}"
@@ -48,6 +49,31 @@
             @endif
 
             <a href="{{ route('orders.invoice', $order) }}" class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">عرض الفاتورة</a>
+        </div> -->
+
+
+        <div class="bg-white shadow rounded-2xl p-4 flex flex-wrap gap-2">
+            @if($order->isPayable())
+                <a href="{{ route('payments.mock.success', $order) }}"
+                    class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700">
+                    ادفع الآن (تجريبي)
+                </a>
+            @endif
+
+            @if($order->isCancelable())
+                <form method="POST" action="{{ route('orders.cancel', $order) }}"
+                    onsubmit="return confirm('هل أنت متأكد من إلغاء الطلب؟');">
+                    @csrf
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700">إلغاء
+                        الطلب</button>
+                </form>
+            @endif
+
+            <a href="{{ route('orders.invoice', $order) }}"
+                class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">عرض الفاتورة</a>
+            <a href="{{ route('orders.invoice.pdf', $order) }}"
+                class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">تحميل PDF</a>
         </div>
+
     </div>
 </x-app-layout>

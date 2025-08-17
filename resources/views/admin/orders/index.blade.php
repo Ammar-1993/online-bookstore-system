@@ -10,28 +10,24 @@
     <table class="min-w-full text-sm">
       <thead class="bg-gray-50">
         <tr class="text-right">
-          <th class="p-3">#</th>
+          <th class="p-3">رقم الطلب</th>
           <th class="p-3">العميل</th>
           <th class="p-3">الدفع</th>
           <th class="p-3">حالة الطلب</th>
           <th class="p-3">التاريخ</th>
-          <th class="p-3">إجراءات</th>
+          <th class="p-3">…</th>
         </tr>
       </thead>
       <tbody>
         @foreach($orders as $order)
           <tr class="border-t">
-            <td class="p-3">{{ $order->id }}</td>
+            <td class="p-3">{{ method_exists($order,'getNumberAttribute') ? $order->number : $order->id }}</td>
             <td class="p-3">{{ $order->user->name ?? '—' }}</td>
             <td class="p-3">
-              <span class="px-2 py-1 rounded-full bg-gray-100 text-xs">
-                {{ $order->payment_status ?? 'unpaid' }}
-              </span>
+              <span class="px-2 py-1 rounded-full bg-gray-100 text-xs">{{ $order->payment_status ?? 'unpaid' }}</span>
             </td>
             <td class="p-3">
-              <span class="px-2 py-1 rounded-full bg-gray-100 text-xs">
-                {{ $order->status }}
-              </span>
+              <span class="px-2 py-1 rounded-full bg-gray-100 text-xs">{{ $order->status }}</span>
             </td>
             <td class="p-3">{{ $order->created_at->format('Y-m-d H:i') }}</td>
             <td class="p-3">
