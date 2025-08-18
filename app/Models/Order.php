@@ -19,13 +19,17 @@ class Order extends Model
         'currency',
         'shipping_address',
         'billing_address',
-        'placed_at'
+        'placed_at',
+        'payment_intent_id',
+        'charge_id',
+        'paid_at',
     ];
 
     protected $casts = [
         'shipping_address' => 'array',
         'billing_address' => 'array',
         'placed_at' => 'datetime',
+        'paid_at' => 'datetime',
     ];
 
     public function items()
@@ -124,13 +128,13 @@ class Order extends Model
     }
 
 
- 
+
     /**
      * إرجاع رقم طلب منسّق مثل ORD-000123
      */
     public function getNumberAttribute(): string
     {
-        return 'ORD-'.str_pad((string) $this->id, 6, '0', STR_PAD_LEFT);
+        return 'ORD-' . str_pad((string) $this->id, 6, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -146,7 +150,7 @@ class Order extends Model
      */
     public function money(float|int $amount): string
     {
-        return number_format((float) $amount, 2).' '.$this->currencyCode();
+        return number_format((float) $amount, 2) . ' ' . $this->currencyCode();
     }
 
     /**

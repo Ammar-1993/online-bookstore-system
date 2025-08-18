@@ -10,9 +10,6 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\StripeController;
 
-
-
-
 // الواجهة العامة
 use App\Http\Controllers\{
     HomeController,
@@ -46,17 +43,12 @@ Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->
 Route::get('/publishers/{publisher:slug}', [PublisherController::class, 'show'])->name('publishers.show');
 Route::get('/authors/{author:slug}', [AuthorController::class, 'show'])->name('authors.show');
 
-
-
-
 // Cart
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add/{book:slug}', [CartController::class, 'add'])->name('cart.add');
 Route::patch('/cart/{book:slug}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/{book:slug}', [CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
-
-
 
 // Checkout (يتطلب تسجيل الدخول لأن orders.user_id غير فارغ)
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
@@ -69,23 +61,14 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
         Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
-        Route::get('/orders/{order}/invoice.pdf', [OrderController::class, 'invoicePdf'])
-            ->name('orders.invoice.pdf');
-
-
+        Route::get('/orders/{order}/invoice.pdf', [OrderController::class, 'invoicePdf'])->name('orders.invoice.pdf');
 
         // تأكيد دفع (نسخة Mock للتطوير)
-        Route::get('/payments/mock/{order}/success', [PaymentController::class, 'mockSuccess'])
-            ->name('payments.mock.success');
+        Route::get('/payments/mock/{order}/success', [PaymentController::class, 'mockSuccess'])->name('payments.mock.success');
 
         // إلغاء طلب
-        Route::post('/orders/{order}/cancel', [PaymentController::class, 'cancel'])
-            ->name('orders.cancel');
-
+        Route::post('/orders/{order}/cancel', [PaymentController::class, 'cancel'])->name('orders.cancel');
     });
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -108,7 +91,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/email/verify', fn() => view('auth.verify-email'))->name('verification.notice');
 
     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-        $request->fulfill(); // يحدّث verified_at
+        $request->fulfill();
         return redirect()->route('dashboard');
     })->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 
@@ -116,16 +99,13 @@ Route::middleware('auth')->group(function () {
         $request->user()->sendEmailVerificationNotification();
         return back()->with('status', 'verification-link-sent');
     })->middleware(['throttle:6,1'])->name('verification.send');
-
-
 });
 
 /*
 |--------------------------------------------------------------------------
 | لوحة التحكم / الإدارة
 |--------------------------------------------------------------------------
-| ملاحظة: تأكد من تعريف aliases لوسائط Spatie في bootstrap/app.php:
-| 'role', 'permission', 'role_or_permission'
+| ملاحظة: تأكد من تعريف aliases لوسائط Spatie في bootstrap/app.php
 */
 Route::prefix('admin')
     ->name('admin.')
@@ -134,24 +114,28 @@ Route::prefix('admin')
         // الصفحة الرئيسية للوحة التحكم
         Route::get('/', DashboardController::class)->name('dashboard');
 
-        // كتب (Seller يدير كتبه فقط عبر الـ Policy؛ Admin يرى الكل)
+        // كتب (Seller يدير كتبه فقط عبر Policy؛ Admin يرى الكل)
         Route::resource('books', AdminBookController::class);
 
-        // إدارة المراجعات: Admin و Seller (Seller يرى مراجعات كتبه فقط - مفلترة في الكنترولر/Policy)
+        // إدارة المراجعات
         Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
         Route::patch('/reviews/{review}/toggle', [AdminReviewController::class, 'toggle'])->name('reviews.toggle');
         Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
+
+        // إدارة الطلبات (Admin & Seller)
+        Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
+
+        // إجراء Refund — Admin فقط
+        Route::post('/orders/{order}/refund', [AdminOrderController::class, 'refund'])
+            ->middleware('role:Admin')
+            ->name('orders.refund');
 
         // موارد خاصة بالمشرف Admin فقط
         Route::middleware('role:Admin')->group(function () {
             Route::resource('categories', AdminCategoryController::class)->except('show');
             Route::resource('publishers', AdminPublisherController::class)->except('show');
             Route::resource('authors', AdminAuthorController::class)->except('show');
-
-            // إدارة المستخدمين (لا إنشاء من اللوحة حاليًا)
             Route::resource('users', AdminUserController::class)->except(['show', 'create', 'store']);
-
-            Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
         });
     });
 
@@ -171,13 +155,9 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 */
 Route::fallback(fn() => abort(404));
 
-
-
-
+// Stripe (الدفع)
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/payments/stripe/{order}', [StripeController::class, 'pay'])->name('payments.stripe.pay');
     Route::post('/payments/stripe/{order}/intent', [StripeController::class, 'createIntent'])->name('payments.stripe.intent');
 });
-
 Route::post('/payments/stripe/webhook', [StripeController::class, 'webhook'])->name('payments.stripe.webhook');
-

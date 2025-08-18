@@ -6,10 +6,12 @@ use App\Http\Controllers\Controller;
 use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
 use App\Notifications\OrderPaidNotification;
 use App\Notifications\OrderCancelledNotification;
 use App\Notifications\OrderStatusUpdatedNotification;
+use Stripe\StripeClient;
 
 class OrderController extends Controller
 {
@@ -32,15 +34,14 @@ class OrderController extends Controller
     public function update(Request $request, Order $order): RedirectResponse
     {
         $data = $request->validate([
-            'status' => ['required', 'string', 'in:' . implode(',', self::STATUSES)],
-            'payment_status' => ['required', 'string', 'in:' . implode(',', self::PAYMENT_STATUSES)],
+            'status'          => ['required', 'string', 'in:' . implode(',', self::STATUSES)],
+            'payment_status'  => ['required', 'string', 'in:' . implode(',', self::PAYMENT_STATUSES)],
         ]);
 
-        $targetStatus = $data['status'];
-        $targetPayment = $data['payment_status'];
-
-        $oldStatus = (string) $order->status;
-        $wasPaid   = ($order->payment_status === 'paid');
+        $targetStatus   = $data['status'];
+        $targetPayment  = $data['payment_status'];
+        $oldStatus      = (string) $order->status;
+        $wasPaid        = ($order->payment_status === 'paid');
 
         if ($targetPayment === 'paid' && $order->payment_status !== 'paid') {
             $order->markPaid();
@@ -64,5 +65,35 @@ class OrderController extends Controller
         }
 
         return back()->with('success', 'تم تحديث الطلب.');
+    }
+
+    public function refund(Order $order): RedirectResponse
+    {
+        $this->authorize('update', $order);
+
+        if ($order->payment_status !== 'paid' || ! $order->charge_id) {
+            return back()->with('warning', 'لا يمكن استرجاع هذا الطلب.');
+        }
+
+        $client = new StripeClient((string) env('STRIPE_SECRET'));
+
+        try {
+            $client->refunds->create([
+                'charge'   => $order->charge_id,
+                'metadata' => ['order_id' => (string) $order->id],
+            ]);
+
+            $order->cancelAndRestock();
+            $order->user?->notify((new OrderCancelledNotification($order))->locale('ar'));
+
+            return back()->with('success', 'تم استرجاع المبلغ وإلغاء الطلب.');
+        } catch (\Throwable $e) {
+            Log::error('admin refund failed', [
+                'order_id' => $order->id,
+                'err'      => $e->getMessage(),
+            ]);
+
+            return back()->with('error', 'فشل الاسترجاع: '.$e->getMessage());
+        }
     }
 }
