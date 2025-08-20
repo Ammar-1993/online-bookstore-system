@@ -15,18 +15,17 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        // Route middleware aliases
         $middleware->alias([
             'role' => RoleMiddleware::class,
             'permission' => PermissionMiddleware::class,
             'role_or_permission' => RoleOrPermissionMiddleware::class,
         ]);
 
-        // استثناء مسار Stripe Webhook من CSRF
-        $middleware->validateCsrfTokens(
-            except: [
-                'payments/stripe/webhook',
-            ]
-        );
+        // CSRF exception for Stripe webhook (covers optional trailing slash/segments)
+        $middleware->validateCsrfTokens(except: [
+            'payments/stripe/webhook*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

@@ -6,6 +6,10 @@ use App\Models\Order;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
+
+use Illuminate\Http\Request;
+use Illuminate\Http\JsonResponse;
+
 use Barryvdh\DomPDF\Facade\Pdf;
 
 
@@ -28,11 +32,31 @@ class OrderController extends Controller
         return view('orders.index', compact('orders'));
     }
 
-    public function show(Order $order): View
+    public function show(Order $order)
     {
         $this->authorize('view', $order);
+
+        // تأكد أن البيانات حديثة (خاصة بعد الويب هوك)
+        $order->refresh();
         $order->load(['items.book', 'user']);
+
         return view('orders.show', compact('order'));
+    }
+
+    // ✅ تُستخدم من واجهة الدفع للانتظار حتى يُصبح الطلب "paid"
+    public function status(Order $order): JsonResponse
+    {
+        $this->authorize('view', $order);
+
+        $order->refresh();
+
+        return response()->json([
+            'id'              => $order->id,
+            'status'          => (string) $order->status,
+            'payment_status'  => (string) $order->payment_status,
+            'paid'            => $order->payment_status === 'paid',
+            'updated_at'      => optional($order->updated_at)->toIso8601String(),
+        ]);
     }
 
     public function invoice(Order $order): View

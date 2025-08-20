@@ -9,7 +9,9 @@
 </head>
 <body class="bg-gray-50 text-gray-900">
   <div class="max-w-xl mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-4">الدفع للطلب {{ method_exists($order,'getNumberAttribute') ? $order->number : ('#'.$order->id) }}</h1>
+    <h1 class="text-2xl font-bold mb-4">
+      الدفع للطلب {{ method_exists($order,'getNumberAttribute') ? $order->number : ('#'.$order->id) }}
+    </h1>
 
     <div class="bg-white p-4 rounded-2xl shadow mb-4">
       <div class="text-sm text-gray-600">الإجمالي</div>
@@ -21,7 +23,8 @@
 
     <form id="payment-form" class="bg-white p-4 rounded-2xl shadow space-y-3">
       <div id="card-element" class="p-3 border rounded-xl"></div>
-      <button id="pay-btn" type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition disabled:opacity-60">
+      <button id="pay-btn" type="submit"
+              class="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition disabled:opacity-60">
         ادفع الآن
       </button>
       <div id="msg" class="text-sm mt-2"></div>
@@ -52,8 +55,8 @@
       btn.textContent = v ? 'جارِ المعالجة…' : 'ادفع الآن';
     }
 
-    // ✅ استخدم مسارًا نسبيًا ليبقى الطلب same-origin (يتفادى 419/CSRF)
     const intentUrl = `/payments/stripe/{{ $order->id }}/intent`;
+    const statusUrl = `/orders/{{ $order->id }}/status`;
 
     async function createIntent(){
       try{
@@ -69,7 +72,6 @@
 
         if(!res.ok){
           const txt = await res.text();
-          console.error('Intent error', res.status, txt);
           if(res.status === 419) throw new Error('انتهت الجلسة (CSRF). حدّث الصفحة ثم جرّب مرة أخرى.');
           try { const j = JSON.parse(txt); throw new Error(j.message || 'تعذر إنشاء عملية الدفع.'); }
           catch { throw new Error('تعذر إنشاء عملية الدفع.'); }
@@ -85,6 +87,21 @@
       }
     }
 
+    async function waitUntilPaid(maxMs = 20000, stepMs = 1500){
+      const started = Date.now();
+      while (Date.now() - started < maxMs) {
+        try {
+          const r = await fetch(statusUrl, { headers: { 'Accept': 'application/json' } });
+          if (r.ok) {
+            const j = await r.json();
+            if (j.paid) return true;
+          }
+        } catch (_) {}
+        await new Promise(res => setTimeout(res, stepMs));
+      }
+      return false;
+    }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       showMsg('');
@@ -96,14 +113,16 @@
       const { error } = await stripe.confirmCardPayment(clientSecret, { payment_method: { card } });
 
       if(error){
-        console.error('confirm error', error);
         showMsg(error.message || 'فشل الدفع.');
         setLoading(false);
         return;
       }
 
-      showMsg('تم الدفع بنجاح.', true);
-      window.location.href = @json(route('orders.show', $order));
+      // تم تأكيد البطاقة بنجاح — انتظر حتى يصل الويب هوك ويُحدّث الطلب ثم وجّه
+      showMsg('تم الدفع بنجاح. جارِ تأكيد الطلب…', true);
+
+      const ok = await waitUntilPaid();
+      window.location.href = @json(route('orders.show', $order)) + (ok ? '' : '?refresh=1');
     });
   });
   </script>

@@ -27,6 +27,9 @@
         $isCancelable = method_exists($order,'isCancelable')
             ? $order->isCancelable()
             : ($payment !== 'paid' && $status !== 'cancelled');
+
+        $currency = $order->currency ?: config('app.currency','USD');
+        $total    = method_exists($order,'computedTotal') ? $order->computedTotal() : $order->items->sum('total_price');
     @endphp
 
     <div class="container mx-auto p-4 space-y-4">
@@ -62,9 +65,7 @@
                 @endforeach
             </div>
             <div class="mt-4 text-right font-bold">
-                الإجمالي:
-                {{ number_format(method_exists($order,'computedTotal') ? $order->computedTotal() : $order->items->sum('total_price'), 2) }}
-                {{ $order->currency ?: config('app.currency','USD') }}
+                الإجمالي: {{ number_format($total, 2) }} {{ $currency }}
             </div>
         </div>
 

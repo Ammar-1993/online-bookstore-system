@@ -50,7 +50,7 @@ Route::patch('/cart/{book:slug}', [CartController::class, 'update'])->name('cart
 Route::delete('/cart/{book:slug}', [CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
-// Checkout (يتطلب تسجيل الدخول لأن orders.user_id غير فارغ)
+// Checkout + طلبات العميل
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
     ->group(function () {
         Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
@@ -60,10 +60,14 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
         // طلباتي (عميل)
         Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+
+        // ✅ نقطة استعلام حالة الطلب (يستعملها الـ polling بعد الدفع)
+        Route::get('/orders/{order}/status', [OrderController::class, 'status'])->name('orders.status');
+
         Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
         Route::get('/orders/{order}/invoice.pdf', [OrderController::class, 'invoicePdf'])->name('orders.invoice.pdf');
 
-        // تأكيد دفع (نسخة Mock للتطوير)
+        // تأكيد دفع تجريبي
         Route::get('/payments/mock/{order}/success', [PaymentController::class, 'mockSuccess'])->name('payments.mock.success');
 
         // إلغاء طلب
@@ -72,7 +76,7 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
 /*
 |--------------------------------------------------------------------------
-| مراجعات الكتب (مستخدم مسجّل + بريد مُفعّل)
+| مراجعات الكتب
 |--------------------------------------------------------------------------
 */
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
@@ -83,9 +87,8 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
 /*
 |--------------------------------------------------------------------------
-| مسارات التحقق من البريد (Jetstream / Fortify)
+| مسارات التحقق من البريد
 |--------------------------------------------------------------------------
-| مفعّلة للمستخدم المسجّل فقط.
 */
 Route::middleware('auth')->group(function () {
     Route::get('/email/verify', fn() => view('auth.verify-email'))->name('verification.notice');
@@ -105,32 +108,23 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 | لوحة التحكم / الإدارة
 |--------------------------------------------------------------------------
-| ملاحظة: تأكد من تعريف aliases لوسائط Spatie في bootstrap/app.php
 */
 Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'role:Admin|Seller'])
     ->group(function () {
-        // الصفحة الرئيسية للوحة التحكم
         Route::get('/', DashboardController::class)->name('dashboard');
 
-        // كتب (Seller يدير كتبه فقط عبر Policy؛ Admin يرى الكل)
         Route::resource('books', AdminBookController::class);
 
-        // إدارة المراجعات
         Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
         Route::patch('/reviews/{review}/toggle', [AdminReviewController::class, 'toggle'])->name('reviews.toggle');
         Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
 
-        // إدارة الطلبات (Admin & Seller)
         Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
-
-        // إجراء Refund — Admin فقط
         Route::post('/orders/{order}/refund', [AdminOrderController::class, 'refund'])
-            ->middleware('role:Admin')
-            ->name('orders.refund');
+            ->middleware('role:Admin')->name('orders.refund');
 
-        // موارد خاصة بالمشرف Admin فقط
         Route::middleware('role:Admin')->group(function () {
             Route::resource('categories', AdminCategoryController::class)->except('show');
             Route::resource('publishers', AdminPublisherController::class)->except('show');
@@ -139,20 +133,10 @@ Route::prefix('admin')
         });
     });
 
-/*
-|--------------------------------------------------------------------------
-| Dashboard الافتراضية بعد تسجيل الدخول (Jetstream)
-|--------------------------------------------------------------------------
-*/
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
     ->get('/dashboard', fn() => view('dashboard'))
     ->name('dashboard');
 
-/*
-|--------------------------------------------------------------------------
-| Fallback (اختياري)
-|--------------------------------------------------------------------------
-*/
 Route::fallback(fn() => abort(404));
 
 // Stripe (الدفع)
