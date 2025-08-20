@@ -19,10 +19,12 @@ class ReviewController extends Controller
             [
                 'rating'   => (int)$request->rating,
                 'comment'  => $request->comment,
-                // عدّلها لـ false لو تبغى تمر بالمراجعة اليدوية
-                'approved' => true,
+                'approved' => true, // غيّرها لـ false لو تريد موافقة يدوية
             ]
         );
+
+        // يعيد الحساب تلقائياً من Model Review، لكن لا مانع من ضمان إضافي:
+        $book->recalculateRatings();
 
         return back()->with('success', 'تم حفظ تقييمك بنجاح.')->withFragment('reviews');
     }
@@ -36,6 +38,8 @@ class ReviewController extends Controller
             'comment' => $request->comment,
         ]);
 
+        $review->book?->recalculateRatings();
+
         return back()->with('success', 'تم تحديث المراجعة.')->withFragment('reviews');
     }
 
@@ -43,6 +47,8 @@ class ReviewController extends Controller
     {
         $this->authorize('delete', $review);
         $review->delete();
+
+        $review->book?->recalculateRatings();
 
         return back()->with('success', 'تم حذف المراجعة.')->withFragment('reviews');
     }

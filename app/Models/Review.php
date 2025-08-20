@@ -19,8 +19,30 @@ class Review extends Model
 
     // سكوبات مفيدة
     public function scopeApproved($q){ $q->where('approved', true); }
-
     public function scopeForSeller($q, int $sellerId){
         $q->whereHas('book', fn($b) => $b->where('seller_id', $sellerId));
+    }
+
+    /**
+     * بعد حفظ/حذف/تحديث الاعتماد، أعد حساب تقييمات الكتاب المرتبط.
+     */
+    protected static function booted(): void
+    {
+        $recalc = function(Review $review): void {
+            // نستخدم find لتجنّب علاقات غير محملة
+            if ($review->book_id) {
+                if ($book = Book::find($review->book_id)) {
+                    $book->recalculateRatings();
+                }
+            }
+        };
+
+        static::saved($recalc);
+        static::deleted($recalc);
+        static::updated(function(Review $review) use ($recalc) {
+            if ($review->wasChanged('approved') || $review->wasChanged('rating')) {
+                $recalc($review);
+            }
+        });
     }
 }

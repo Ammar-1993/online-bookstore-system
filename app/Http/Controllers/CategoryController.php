@@ -25,7 +25,7 @@ class CategoryController extends Controller
             });
         }
 
-        $books = $q->latest('published_at')->paginate(12)->withQueryString();
+        $books = $q->latest('published_at')->paginate(10)->withQueryString();
 
         return view('categories.show', compact('category','books'));
     }

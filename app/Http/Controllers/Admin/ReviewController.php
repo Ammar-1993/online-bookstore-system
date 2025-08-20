@@ -19,7 +19,7 @@ class ReviewController extends Controller
         $reviews = Review::query()
             ->with(['book:id,title,slug,seller_id','user:id,name,email'])
             ->when(auth()->user()->hasRole('Seller'), function (Builder $b) {
-                $b->forSeller(auth()->id()); // من سكوب Review
+                $b->forSeller(auth()->id());
             })
             ->when($filter === 'approved', fn($b) => $b->where('approved', true))
             ->when($filter === 'pending',  fn($b) => $b->where('approved', false))
@@ -37,7 +37,11 @@ class ReviewController extends Controller
     public function toggle(Review $review): RedirectResponse
     {
         $this->authorize('moderate', $review);
+
         $review->update(['approved' => ! $review->approved]);
+
+        // تحديث كاش التقييمات
+        $review->book?->recalculateRatings();
 
         return back()->with('success', 'تم تحديث حالة المراجعة.');
     }
@@ -45,7 +49,10 @@ class ReviewController extends Controller
     public function destroy(Review $review): RedirectResponse
     {
         $this->authorize('moderate', $review);
+        $book = $review->book;
         $review->delete();
+
+        $book?->recalculateRatings();
 
         return back()->with('success', 'تم حذف المراجعة.');
     }

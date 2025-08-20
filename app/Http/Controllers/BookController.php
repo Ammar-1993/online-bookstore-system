@@ -9,24 +9,16 @@ class BookController extends Controller
 {
     public function show(Book $book): View
     {
-        // تفاصيل وعلاقات أساسية
+        // العلاقات الأساسية لعرض التفاصيل
         $book->load([
             'category:id,name,slug',
             'publisher:id,name,slug',
             'authors:id,name,slug',
         ]);
 
-        // إحصاءات التقييمات المعتمدة فقط
-        $book->loadCount([
-            'reviews as ratings_count' => fn ($q) => $q->where('approved', true),
-        ])->loadAvg(
-            ['reviews as avg_rating' => fn ($q) => $q->where('approved', true)],
-            'rating'
-        );
-
-        // مراجعات معتمدة + ترقيم صفحات
+        // المراجعات المعتمدة + المستخدم + ترقيم الصفحات
         $reviews = $book->reviews()
-            ->where('approved', true)
+            ->approved()
             ->with('user:id,name')
             ->latest()
             ->paginate(10)
@@ -34,7 +26,38 @@ class BookController extends Controller
             ->onEachSide(1)
             ->fragment('reviews');
 
-        // كتب مرتبطة: أولاً بنفس التصنيف إن وُجد، وإلا نحاول بالمُعلِن/الناشر، وإلا نعرض أحدث المنشور
+        // متوسط وعدد التقييمات (باستخدام الحقول المخبأة إن وُجدت وإلا fallback)
+        $avgRating    = (float) ($book->ratings_avg   ?? 0);
+        $ratingsCount = (int)   ($book->ratings_count ?? 0);
+
+        if ($ratingsCount === 0) {
+            $agg = $book->reviews()
+                ->approved()
+                ->selectRaw('COUNT(*) as c, COALESCE(AVG(rating),0) as a')
+                ->first();
+            $ratingsCount = (int) ($agg->c ?? 0);
+            $avgRating    = round((float) ($agg->a ?? 0), 2);
+        }
+
+        // توزيع التقييمات: group by rating
+        $grouped = $book->reviews()
+            ->approved()
+            ->selectRaw('rating, COUNT(*) as c')
+            ->groupBy('rating')
+            ->pluck('c', 'rating'); // [rating => count]
+
+        $starsDist = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $starsDist[$i] = (int) ($grouped[$i] ?? 0);
+        }
+
+        $total = array_sum($starsDist);
+        $starsPercent = [];
+        foreach ($starsDist as $i => $c) {
+            $starsPercent[$i] = $total > 0 ? round(($c * 100) / $total, 0) : 0;
+        }
+
+        // كتب مرتبطة: أولوية للتصنيف، ثم الناشر، وإلا أحدث المنشور
         $related = Book::query()
             ->where('id', '!=', $book->id)
             ->when($book->category_id, fn($q) => $q->where('category_id', $book->category_id))
@@ -47,11 +70,13 @@ class BookController extends Controller
             ->get();
 
         return view('books.show', [
-            'book'         => $book,
-            'reviews'      => $reviews,
-            'avgRating'    => (float) ($book->avg_rating ?? 0),
-            'ratingsCount' => (int)   ($book->ratings_count ?? 0),
-            'related'      => $related, // <-- مهم
+            'book'          => $book,
+            'reviews'       => $reviews,
+            'avgRating'     => $avgRating,
+            'ratingsCount'  => $ratingsCount,
+            'starsDist'     => $starsDist,
+            'starsPercent'  => $starsPercent,
+            'related'       => $related,
         ]);
     }
 }

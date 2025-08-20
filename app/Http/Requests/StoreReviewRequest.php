@@ -6,7 +6,7 @@ use Illuminate\Foundation\Http\FormRequest;
 
 class StoreReviewRequest extends FormRequest
 {
-    public function authorize(): bool { return auth()->check(); }
+    public function authorize(): bool { return auth()->check() && auth()->user()->hasVerifiedEmail(); }
 
     public function rules(): array
     {

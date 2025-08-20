@@ -16,7 +16,7 @@ class PublisherController extends Controller
             $q->where('title','like',"%{$s}%");
         }
 
-        $books = $q->latest('published_at')->paginate(12)->withQueryString();
+        $books = $q->latest('published_at')->paginate(10)->withQueryString();
 
         return view('publishers.show', compact('publisher','books'));
     }
