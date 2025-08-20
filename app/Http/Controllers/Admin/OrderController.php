@@ -18,10 +18,49 @@ class OrderController extends Controller
     private const STATUSES = ['pending', 'processing', 'shipped', 'cancelled'];
     private const PAYMENT_STATUSES = ['unpaid', 'paid', 'refunded'];
 
-    public function index(): View
+    public function index(Request $request): View
     {
-        $orders = Order::with('user')->latest()->paginate(20);
-        return view('admin.orders.index', compact('orders'));
+        $validated = $request->validate([
+            'status'          => ['nullable', 'in:' . implode(',', self::STATUSES)],
+            'payment_status'  => ['nullable', 'in:' . implode(',', self::PAYMENT_STATUSES)],
+            'email'           => ['nullable', 'string', 'max:255'],
+            'from'            => ['nullable', 'date'],
+            'to'              => ['nullable', 'date'],
+        ]);
+
+        $orders = Order::query()
+            ->with('user')
+            ->when(!empty($validated['status']), fn($q) =>
+                $q->where('status', $validated['status'])
+            )
+            ->when(!empty($validated['payment_status']), fn($q) =>
+                $q->where('payment_status', $validated['payment_status'])
+            )
+            ->when(!empty($validated['email']), fn($q) =>
+                $q->whereHas('user', function ($uq) use ($validated) {
+                    $email = trim((string) $validated['email']);
+                    $uq->where('email', 'like', '%' . $email . '%');
+                })
+            )
+            ->when(!empty($validated['from']), fn($q) =>
+                $q->where('created_at', '>=', $validated['from'] . ' 00:00:00')
+            )
+            ->when(!empty($validated['to']), fn($q) =>
+                $q->where('created_at', '<=', $validated['to'] . ' 23:59:59')
+            )
+            ->latest()
+            ->paginate(20)
+            ->withQueryString();
+
+        return view('admin.orders.index', compact('orders') + [
+            'filters' => [
+                'status'         => $validated['status']         ?? null,
+                'payment_status' => $validated['payment_status'] ?? null,
+                'email'          => $validated['email']          ?? null,
+                'from'           => $validated['from']           ?? null,
+                'to'             => $validated['to']             ?? null,
+            ],
+        ]);
     }
 
     public function show(Order $order): View

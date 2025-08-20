@@ -3,47 +3,79 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\View\View;
-
-
-use Illuminate\Http\Request;
-use Illuminate\Http\JsonResponse;
-
 use Barryvdh\DomPDF\Facade\Pdf;
-
-
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class OrderController extends Controller
 {
+    /**
+     * صفحة "مشترياتي" مع فلاتر بسيطة.
+     */
     public function index(): View
     {
+        $user = Auth::user();
 
+        // اجمع فلاتر الواجهة (تتوافق مع القالب resources/views/orders/index.blade.php)
+        $filters = [
+            'status'         => request('status'),
+            'payment_status' => request('payment_status'),
+            'from'           => request('from'),
+            'to'             => request('to'),
+            'q'              => trim((string) request('q', '')),
+        ];
 
+        $orders = $user->orders()
+            ->with('items') // لاستخراج الإجمالي سريعًا
+            ->when($filters['status'], fn($q, $v) => $q->where('status', $v))
+            ->when($filters['payment_status'], fn($q, $v) => $q->where('payment_status', $v))
+            ->when($filters['from'], fn($q, $v) => $q->whereDate('created_at', '>=', $v))
+            ->when($filters['to'], fn($q, $v) => $q->whereDate('created_at', '<=', $v))
+            ->when($filters['q'] !== '', function ($q) use ($filters) {
+                $term = $filters['q'];
 
-        $orders = auth()->user()
-            ->orders()
+                // يدعم (ORD-000123) أو (123) أو أجزاء من payment_intent/charge
+                $maybeId = null;
+                if (preg_match('/(\d+)/', $term, $m)) {
+                    $maybeId = (int) $m[1];
+                }
+
+                $q->where(function ($qq) use ($term, $maybeId) {
+                    if ($maybeId) {
+                        $qq->orWhere('id', $maybeId);
+                    }
+                    $qq->orWhere('payment_intent_id', 'like', "%{$term}%")
+                       ->orWhere('charge_id', 'like', "%{$term}%");
+                });
+            })
             ->latest()
-            ->with('items')   // حمل العناصر مسبقًا
-            ->paginate(10);
+            ->paginate(10)
+            ->withQueryString();
 
-
-        $orders = Auth::user()->orders()->latest()->with('items')->paginate(10);
-        return view('orders.index', compact('orders'));
+        return view('orders.index', compact('orders', 'filters'));
     }
 
-    public function show(Order $order)
+    /**
+     * صفحة تفاصيل الطلب.
+     */
+    public function show(Order $order): View
     {
         $this->authorize('view', $order);
 
-        // تأكد أن البيانات حديثة (خاصة بعد الويب هوك)
+        // تأكد أن الحالة محدثة (مثلاً بعد Webhook)
         $order->refresh();
         $order->load(['items.book', 'user']);
 
         return view('orders.show', compact('order'));
     }
 
-    // ✅ تُستخدم من واجهة الدفع للانتظار حتى يُصبح الطلب "paid"
+    /**
+     * Endpoint خفيف لتتبّع حالة الطلب من الواجهة (Polling).
+     */
     public function status(Order $order): JsonResponse
     {
         $this->authorize('view', $order);
@@ -51,75 +83,66 @@ class OrderController extends Controller
         $order->refresh();
 
         return response()->json([
-            'id'              => $order->id,
-            'status'          => (string) $order->status,
-            'payment_status'  => (string) $order->payment_status,
-            'paid'            => $order->payment_status === 'paid',
-            'updated_at'      => optional($order->updated_at)->toIso8601String(),
+            'id'             => $order->id,
+            'status'         => (string) $order->status,
+            'payment_status' => (string) $order->payment_status,
+            'paid'           => $order->payment_status === 'paid',
+            'updated_at'     => optional($order->updated_at)->toIso8601String(),
         ]);
     }
 
+    /**
+     * عرض الفاتورة HTML.
+     */
     public function invoice(Order $order): View
     {
         $this->authorize('view', $order);
         $order->load(['items.book', 'user']);
+
         return view('orders.invoice', compact('order'));
     }
 
+    /**
+     * تنزيل الفاتورة PDF عبر mPDF (جاهزة للـ RTL).
+     */
+    public function invoicePdf(Order $order): Response
+    {
+        $this->authorize('view', $order);
+        $order->load(['items.book', 'user']);
 
+        $html = view('orders.invoice-pdf', compact('order'))->render();
 
-    // public function invoicePdf(Order $order)
-    // {
-    //     $this->authorize('view', $order);
-    //     $order->load(['items.book', 'user']);
+        // تأكد من مجلد tmp الخاص بـ mPDF لتجنّب أخطاء الأذونات
+        $tmp = storage_path('app/mpdf-temp');
+        File::ensureDirectoryExists($tmp);
 
+        $mpdf = new \Mpdf\Mpdf([
+            'mode'           => 'utf-8',
+            'format'         => 'A4',
+            'orientation'    => 'P',
+            'default_font'   => 'dejavusans',
+            'margin_top'     => 0,
+            'margin_bottom'  => 0,
+            'margin_left'    => 0,
+            'margin_right'   => 0,
+            'tempDir'        => $tmp,
+        ]);
 
-    //     $pdf = Pdf::loadView('orders.invoice-pdf', compact('order'))
-    //         ->setPaper('a4', 'portrait')
-    //         ->setOptions([
-    //             'isHtml5ParserEnabled' => true,
-    //             'isRemoteEnabled' => true,
-    //             'defaultFont' => 'DejaVu Sans',
-    //         ]);
+        $mpdf->autoScriptToLang = true;
+        $mpdf->autoLangToFont   = true;
+        $mpdf->SetDirectionality('rtl');
 
-    //     $file = 'invoice-' . (method_exists($order, 'getNumberAttribute') ? $order->number : $order->id) . '.pdf';
-    //     return $pdf->download($file);
+        $mpdf->WriteHTML($html);
 
-    // }
+        $file = 'invoice-' . (method_exists($order, 'getNumberAttribute') ? $order->number : $order->id) . '.pdf';
 
-    public function invoicePdf(Order $order)
-{
-    $this->authorize('view', $order);
-    $order->load(['items.book','user']);
-
-    $html = view('orders.invoice-pdf', compact('order'))->render();
-
-    $mpdf = new \Mpdf\Mpdf([
-        'mode' => 'utf-8',
-        'format' => 'A4',
-        'orientation' => 'P',
-        'default_font' => 'dejavusans',
-        'margin_top' => 0,
-        'margin_bottom' => 0,
-        'margin_left' => 0,
-        'margin_right' => 0,
-        'tempDir' => storage_path('app/mpdf-temp'),
-    ]);
-
-    $mpdf->autoScriptToLang = true;   // تفعيل كشف اللغة (تشكيل العربية)
-    $mpdf->autoLangToFont   = true;   // اختيار خط مناسب تلقائيًا
-    $mpdf->SetDirectionality('rtl');  // افتراض اتجاه RTL للصفحة
-
-    $mpdf->WriteHTML($html);
-
-    $file = 'invoice-' . (method_exists($order,'getNumberAttribute') ? $order->number : $order->id) . '.pdf';
-
-    return response($mpdf->Output($file, \Mpdf\Output\Destination::STRING_RETURN), 200, [
-        'Content-Type' => 'application/pdf',
-        'Content-Disposition' => 'attachment; filename="'.$file.'"',
-    ]);
+        return response(
+            $mpdf->Output($file, \Mpdf\Output\Destination::STRING_RETURN),
+            200,
+            [
+                'Content-Type'        => 'application/pdf',
+                'Content-Disposition' => 'attachment; filename="'.$file.'"',
+            ]
+        );
+    }
 }
-
-}
-
-
