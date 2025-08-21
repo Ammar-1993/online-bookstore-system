@@ -83,47 +83,8 @@ It includes a public catalog with search, product pages, reviews, a session-base
 
 ---
 
-## Project structure
+## Screenshot
 
-```
-app/
-  Http/Controllers/
-    Admin/…               # Admin controllers (orders, books, …)
-    CartController.php
-    CheckoutController.php
-    OrderController.php   # My Orders (user)
-    PaymentController.php # Mock pay + cancel
-    StripeController.php  # Stripe UI + intent + webhook
-  Models/
-    Book.php
-    Order.php
-    OrderItem.php
-    Review.php
-  Policies/
-    BookPolicy.php
-    OrderPolicy.php
-    ReviewPolicy.php
-  Support/Cart.php        # Session cart
-
-resources/views/
-  layouts/app.blade.php         # Base layout (RTL)
-  components/flash-stack.blade.php
-  home.blade.php
-  books/show.blade.php
-  books/partials/reviews.blade.php
-  components/book-card.blade.php
-  cart/index.blade.php
-  orders/index.blade.php
-  orders/show.blade.php
-  orders/invoice.blade.php
-  orders/invoice-pdf.blade.php
-  payments/stripe.blade.php
-
-routes/web.php
-
-bootstrap/app.php              # Middleware aliases + CSRF exception for Stripe webhook
-
-config/services.php            # Third party services
 ```
 
 ---
