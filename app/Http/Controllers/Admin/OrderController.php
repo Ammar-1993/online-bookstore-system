@@ -11,6 +11,7 @@ use Illuminate\View\View;
 use App\Notifications\OrderPaidNotification;
 use App\Notifications\OrderCancelledNotification;
 use App\Notifications\OrderStatusUpdatedNotification;
+use App\Notifications\OrderShippedNotification;
 use Stripe\StripeClient;
 
 class OrderController extends Controller
@@ -104,6 +105,28 @@ class OrderController extends Controller
         }
 
         return back()->with('success', 'تم تحديث الطلب.');
+    }
+
+    /** إجراء الشحن: تعيين رقم تتبع وتغيير الحالة وإرسال بريد */
+    public function ship(Request $request, Order $order): RedirectResponse
+    {
+        $this->authorize('update', $order);
+
+        $data = $request->validate([
+            'tracking_number' => ['required', 'string', 'max:190'],
+            'shipping_carrier'=> ['nullable', 'string', 'max:50'],
+            'tracking_url'    => ['nullable', 'url', 'max:500'],
+        ]);
+
+        $order->markShipped(
+            $data['tracking_number'],
+            $data['shipping_carrier'] ?? null,
+            $data['tracking_url'] ?? null
+        );
+
+        $order->user?->notify((new OrderShippedNotification($order))->locale('ar'));
+
+        return back()->with('success', 'تم تحديث معلومات الشحن وإرسال إشعار للعميل.');
     }
 
     public function refund(Order $order): RedirectResponse

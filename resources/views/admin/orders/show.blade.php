@@ -45,6 +45,58 @@
     <div class="mt-3 text-right font-bold">الإجمالي: {{ number_format($order->items->sum('total_price'), 2) }}</div>
   </div>
 
+  {{-- ✅ قسم الشحن --}}
+  <div class="bg-white shadow rounded-2xl p-4 space-y-3">
+    <h2 class="font-semibold">الشحن</h2>
+
+    @if($order->tracking_number)
+      <div class="rounded-xl border p-3 bg-gray-50 text-sm">
+        <div>شركة الشحن: <strong>{{ $order->shipping_carrier ?? '—' }}</strong></div>
+        <div>رقم التتبع: 
+          <strong>
+            @if($order->tracking_url)
+              <a class="text-indigo-600 hover:underline" target="_blank" rel="noopener"
+                 href="{{ $order->tracking_url }}">{{ $order->tracking_number }}</a>
+            @else
+              {{ $order->tracking_number }}
+            @endif
+          </strong>
+        </div>
+        <div>تاريخ الشحن: <strong>{{ optional($order->shipped_at)->format('Y-m-d H:i') ?? '—' }}</strong></div>
+      </div>
+    @endif
+
+    {{-- نموذج التحديث/الإضافة --}}
+    <form method="POST" action="{{ route('admin.orders.ship', $order) }}" class="grid sm:grid-cols-3 gap-3">
+      @csrf
+      <div>
+        <label class="text-sm">شركة الشحن (اختياري)</label>
+        <select name="shipping_carrier" class="w-full rounded-xl border-gray-300">
+          <option value="">—</option>
+          @foreach(['ups'=>'UPS','fedex'=>'FedEx','dhl'=>'DHL','aramex'=>'Aramex','usps'=>'USPS'] as $val=>$label)
+            <option value="{{ $val }}" @selected($order->shipping_carrier === $val)>{{ $label }}</option>
+          @endforeach
+        </select>
+      </div>
+      <div>
+        <label class="text-sm">رقم التتبع <span class="text-red-600">*</span></label>
+        <input type="text" name="tracking_number" required value="{{ old('tracking_number', $order->tracking_number) }}"
+               class="w-full rounded-xl border-gray-300" placeholder="مثال: 1Z999AA10123456784">
+      </div>
+      <div>
+        <label class="text-sm">رابط التتبع (اختياري)</label>
+        <input type="url" name="tracking_url" value="{{ old('tracking_url', $order->tracking_url) }}"
+               class="w-full rounded-xl border-gray-300" placeholder="https://...">
+      </div>
+
+      <div class="sm:col-span-3">
+        <button class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">
+          حفظ معلومات الشحن / تمييز كـ (shipped)
+        </button>
+      </div>
+    </form>
+  </div>
+
   <div class="bg-white shadow rounded-2xl p-4 space-y-3">
     <h2 class="font-semibold">إجراءات</h2>
 

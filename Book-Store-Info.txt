@@ -16,6 +16,10 @@ cd /mnt/d/projects
 ./vendor/bin/sail artisan config:clear
 ./vendor/bin/sail artisan optimize:clear
 
+powershell
+ stripe listen --forward-to http://127.0.0.1:8080/payments/stripe/webhook --log-level info
+ stripe listen --forward-to http://127.0.0.1:8080/payments/stripe/webhook --log-level info
+
 
 
 http://localhost:8080/

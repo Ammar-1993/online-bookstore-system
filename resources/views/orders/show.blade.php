@@ -5,31 +5,31 @@
 
     @php
         $payment = $order->payment_status ?? 'unpaid';
-        $status  = $order->status ?? 'pending';
+        $status = $order->status ?? 'pending';
 
         $payClass = [
-            'paid'     => 'bg-emerald-100 text-emerald-700',
+            'paid' => 'bg-emerald-100 text-emerald-700',
             'refunded' => 'bg-amber-100 text-amber-700',
-            'unpaid'   => 'bg-gray-100 text-gray-700',
+            'unpaid' => 'bg-gray-100 text-gray-700',
         ][$payment] ?? 'bg-gray-100 text-gray-700';
 
         $statusClass = [
-            'pending'    => 'bg-gray-100 text-gray-700',
+            'pending' => 'bg-gray-100 text-gray-700',
             'processing' => 'bg-blue-100 text-blue-700',
-            'shipped'    => 'bg-indigo-100 text-indigo-700',
-            'cancelled'  => 'bg-rose-100 text-rose-700',
+            'shipped' => 'bg-indigo-100 text-indigo-700',
+            'cancelled' => 'bg-rose-100 text-rose-700',
         ][$status] ?? 'bg-gray-100 text-gray-700';
 
-        $isPayable = method_exists($order,'isPayable')
+        $isPayable = method_exists($order, 'isPayable')
             ? $order->isPayable()
             : ($payment !== 'paid' && $status !== 'cancelled');
 
-        $isCancelable = method_exists($order,'isCancelable')
+        $isCancelable = method_exists($order, 'isCancelable')
             ? $order->isCancelable()
             : ($payment !== 'paid' && $status !== 'cancelled');
 
-        $currency = $order->currency ?: config('app.currency','USD');
-        $total    = method_exists($order,'computedTotal') ? $order->computedTotal() : $order->items->sum('total_price');
+        $currency = $order->currency ?: config('app.currency', 'USD');
+        $total = method_exists($order, 'computedTotal') ? $order->computedTotal() : $order->items->sum('total_price');
     @endphp
 
     <div class="container mx-auto p-4 space-y-4">
@@ -69,37 +69,59 @@
             </div>
         </div>
 
+        {{-- ✅ تفاصيل الشحن للعميل --}}
+        @if($order->status === 'shipped' || $order->tracking_number)
+            <div class="bg-white shadow rounded-2xl p-4">
+                <h2 class="font-semibold mb-3">تفاصيل الشحن</h2>
+                <div class="text-sm space-y-1">
+                    <div>شركة الشحن: <strong>{{ $order->shipping_carrier ?? '—' }}</strong></div>
+                    <div>
+                        رقم التتبع:
+                        <strong>
+                            @if($order->tracking_url)
+                                <a class="text-indigo-600 hover:underline" target="_blank" rel="noopener"
+                                    href="{{ $order->tracking_url }}">{{ $order->tracking_number }}</a>
+                            @else
+                                {{ $order->tracking_number ?? '—' }}
+                            @endif
+                        </strong>
+                    </div>
+                    <div>تاريخ الشحن: <strong>{{ optional($order->shipped_at)->format('Y-m-d H:i') ?? '—' }}</strong></div>
+                </div>
+            </div>
+        @endif
+
+
         <div class="bg-white shadow rounded-2xl p-4 flex flex-wrap items-center gap-2">
             @if($isPayable)
                 <a href="{{ route('payments.stripe.pay', $order) }}"
-                   class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">
+                    class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">
                     الدفع ببطاقة (Stripe اختبار)
                 </a>
 
                 @env('local')
-                <a href="{{ route('payments.mock.success', $order) }}"
-                   class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700">
-                    ادفع الآن (تجريبي)
-                </a>
+                    <a href="{{ route('payments.mock.success', $order) }}"
+                        class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700">
+                        ادفع الآن (تجريبي)
+                    </a>
                 @endenv
             @endif
 
             @if($isCancelable)
                 <form method="POST" action="{{ route('orders.cancel', $order) }}"
-                      onsubmit="return confirm('هل أنت متأكد من إلغاء الطلب؟');">
+                    onsubmit="return confirm('هل أنت متأكد من إلغاء الطلب؟');">
                     @csrf
-                    <button type="submit"
-                            class="px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700">
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-red-600 text-white hover:bg-red-700">
                         إلغاء الطلب
                     </button>
                 </form>
             @endif
 
             <a href="{{ route('orders.invoice', $order) }}"
-               class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">عرض الفاتورة</a>
+                class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">عرض الفاتورة</a>
 
             <a href="{{ route('orders.invoice.pdf', $order) }}"
-               class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">تحميل PDF</a>
+                class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">تحميل PDF</a>
         </div>
 
     </div>

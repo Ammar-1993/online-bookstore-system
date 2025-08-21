@@ -104,6 +104,7 @@ Route::middleware('auth')->group(function () {
     })->middleware(['throttle:6,1'])->name('verification.send');
 });
 
+
 /*
 |--------------------------------------------------------------------------
 | لوحة التحكم / الإدارة
@@ -124,6 +125,9 @@ Route::prefix('admin')
         Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
         Route::post('/orders/{order}/refund', [AdminOrderController::class, 'refund'])
             ->middleware('role:Admin')->name('orders.refund');
+        // ✅ شحن الطلب (تعيين رقم تتبع وإرسال بريد)
+        Route::post('/orders/{order}/ship', [AdminOrderController::class, 'ship'])
+            ->name('orders.ship');
 
         Route::middleware('role:Admin')->group(function () {
             Route::resource('categories', AdminCategoryController::class)->except('show');
