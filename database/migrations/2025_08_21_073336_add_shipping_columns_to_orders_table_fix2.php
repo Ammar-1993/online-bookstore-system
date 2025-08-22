@@ -8,18 +8,36 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            // معلومات الشحن/التتبع
-            $table->string('tracking_number')->nullable()->after('payment_status');
-            $table->string('shipping_carrier', 50)->nullable()->after('tracking_number');
-            $table->string('tracking_url')->nullable()->after('shipping_carrier');
-            $table->timestamp('shipped_at')->nullable()->after('placed_at');
+            if (! Schema::hasColumn('orders', 'tracking_number')) {
+                $table->string('tracking_number')->nullable()->after('payment_status');
+            }
+            if (! Schema::hasColumn('orders', 'shipping_carrier')) {
+                $table->string('shipping_carrier')->nullable()->after('tracking_number');
+            }
+            if (! Schema::hasColumn('orders', 'shipped_at')) {
+                $table->timestamp('shipped_at')->nullable()->after('shipping_carrier');
+            }
+            if (! Schema::hasColumn('orders', 'tracking_url')) {
+                $table->string('tracking_url')->nullable()->after('shipped_at');
+            }
         });
     }
 
     public function down(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            $table->dropColumn(['tracking_number', 'shipping_carrier', 'tracking_url', 'shipped_at']);
+            if (Schema::hasColumn('orders', 'tracking_url')) {
+                $table->dropColumn('tracking_url');
+            }
+            if (Schema::hasColumn('orders', 'shipped_at')) {
+                $table->dropColumn('shipped_at');
+            }
+            if (Schema::hasColumn('orders', 'shipping_carrier')) {
+                $table->dropColumn('shipping_carrier');
+            }
+            if (Schema::hasColumn('orders', 'tracking_number')) {
+                $table->dropColumn('tracking_number');
+            }
         });
     }
 };
