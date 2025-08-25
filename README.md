@@ -87,8 +87,6 @@ It includes a public catalog with search, product pages, reviews, a session-base
 
 ```
 
----
-
 ## Prerequisites
 
 * **Docker** (for Laravel Sail)
@@ -431,6 +429,4 @@ STRIPE_WEBHOOK_SECRET=whsec_test_secret
 
 ---
 
-## License
 
-This project is open-sourced under the MIT license.
