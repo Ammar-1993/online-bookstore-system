@@ -30,7 +30,7 @@
     <input type="hidden" name="qty" value="1">
     <button type="submit"
             class="w-full px-3 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60"
-            @if(! $inStock) disabled @endif>
+            @if(! $inStock) disabled @endif data-ripple data-loader>
       أضف للسلة
     </button>
   </form>

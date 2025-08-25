@@ -10,9 +10,9 @@
 <body class="bg-gray-50 text-gray-900">
     <header class="bg-white border-b">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="{{ route('home') }}" class="font-bold text-xl">متجر الكتب</a>
+            <a href="{{ route('home') }}" class="font-bold text-xl" data-ripple data-loader>متجر الكتب</a>
             <nav class="flex items-center gap-3 text-sm">
-                <a href="{{ route('home') }}" class="hover:text-indigo-600">الرئيسية</a>
+                <a href="{{ route('home') }}" class="hover:text-indigo-600" data-ripple data-loader>الرئيسية</a>
             </nav>
         </div>
     </header>
@@ -26,7 +26,9 @@
         @if(empty($items))
             <div class="bg-white rounded-2xl shadow p-8 text-center text-gray-600">
                 السلة فارغة حاليًا.
-                <a href="{{ route('home') }}" class="text-indigo-600 hover:underline">تابع التسوق</a>
+                <a href="{{ route('home') }}" class="text-indigo-600 hover:underline" data-ripple data-loader>
+                    تابع التسوق
+                </a>
             </div>
         @else
             <div class="grid lg:grid-cols-3 gap-6">
@@ -64,7 +66,8 @@
                                                     alt="{{ $title }}">
                                                 <div>
                                                     <a class="font-medium hover:text-indigo-700"
-                                                       href="{{ route('books.show', $slug) }}">
+                                                       href="{{ route('books.show', $slug) }}"
+                                                       data-ripple data-loader>
                                                         {{ $title }}
                                                     </a>
                                                     <div class="text-xs text-gray-500 mt-1">
@@ -96,7 +99,7 @@
                                                 <button
                                                     class="px-3 py-1.5 rounded-xl bg-gray-100 hover:bg-gray-200 disabled:opacity-60"
                                                     @if($max <= 0) disabled @endif
-                                                >
+                                                    data-ripple>
                                                     تحديث
                                                 </button>
                                             </form>
@@ -110,7 +113,7 @@
                                             <form method="POST" action="{{ route('cart.remove', $slug) }}">
                                                 @csrf
                                                 @method('DELETE')
-                                                <button class="text-rose-600 hover:underline">حذف</button>
+                                                <button class="text-rose-600 hover:underline" data-ripple>حذف</button>
                                             </form>
                                         </td>
                                     </tr>
@@ -123,7 +126,7 @@
                     <form method="POST" action="{{ route('cart.clear') }}" class="mt-4">
                         @csrf
                         @method('DELETE')
-                        <button class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">
+                        <button class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200" data-ripple>
                             تفريغ السلة
                         </button>
                     </form>
@@ -142,11 +145,14 @@
                         </div>
 
                         <a href="{{ route('checkout.show') }}"
-                           class="mt-4 w-full inline-flex items-center justify-center px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">
+                           class="mt-4 w-full inline-flex items-center justify-center px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700"
+                           data-ripple data-loader>
                             متابعة الدفع
                         </a>
 
-                        <a href="{{ route('home') }}" class="mt-2 block text-center text-sm text-indigo-600 hover:underline">
+                        <a href="{{ route('home') }}"
+                           class="mt-2 block text-center text-sm text-indigo-600 hover:underline"
+                           data-ripple data-loader>
                             العودة للتسوق
                         </a>
                     </div>
@@ -154,5 +160,8 @@
             </div>
         @endif
     </main>
+
+    {{-- لازم نضيف اللودر هنا لأن الصفحة لا تستخدم layout --}}
+    <x-page-loader />
 </body>
 </html>
