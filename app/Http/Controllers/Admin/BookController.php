@@ -20,26 +20,55 @@ class BookController extends Controller
     {
         $this->authorize('viewAny', Book::class);
 
-        $query = Book::with(['category', 'publisher', 'authors']) // <-- authors (جمع)
+        $s = trim((string) $request->get('s', ''));
+        $sort = $request->get('sort', 'id');             // id | title | isbn | price | stock_qty | status | created_at | category | publisher
+        $dir = strtolower($request->get('dir', 'desc')) === 'asc' ? 'asc' : 'desc';
+
+        $allowedSorts = ['id', 'title', 'isbn', 'price', 'stock_qty', 'status', 'created_at', 'category', 'publisher'];
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'id';
+        }
+
+        $query = Book::query()
+            ->with(['category', 'publisher', 'authors'])
             ->when(
                 auth()->user()->hasRole('Seller'),
-                fn(Builder $q) =>
-                $q->where('seller_id', auth()->id())
+                fn(Builder $q) => $q->where('seller_id', auth()->id())
             )
-            ->when(
-                $s = $request->get('s'),
-                fn(Builder $q) =>
+            ->when($s !== '', function (Builder $q) use ($s) {
                 $q->where(function (Builder $qq) use ($s) {
                     $qq->where('title', 'like', "%{$s}%")
                         ->orWhere('isbn', 'like', "%{$s}%");
-                })
+                });
+            });
+
+        // تطبيق الفرز
+        if (in_array($sort, ['id', 'title', 'isbn', 'price', 'stock_qty', 'status', 'created_at'], true)) {
+            $query->orderBy($sort, $dir);
+        } elseif ($sort === 'category') {
+            // فرز حسب اسم التصنيف المرتبط
+            $query->orderBy(
+                Category::select('name')->whereColumn('categories.id', 'books.category_id'),
+                $dir
             );
+        } elseif ($sort === 'publisher') {
+            // فرز حسب اسم الناشر المرتبط
+            $query->orderBy(
+                Publisher::select('name')->whereColumn('publishers.id', 'books.publisher_id'),
+                $dir
+            );
+        }
 
-        // لاحظ أسماء الأعمدة حسب المايجريشن (stock_qty, cover_image_path)
-        $books = $query->latest()->paginate(6)->withQueryString();
+        // افتراضيًا إن لم يُحدَّد شيء، يبقى id desc (مغطّى أعلاه)، ولو أردت override:
+        if ($sort === 'id' && $dir === 'desc') {
+            // لا شيء، orderBy(id, desc) مطبق
+        }
 
-        return view('admin.books.index', compact('books'));
+        $books = $query->paginate(6)->withQueryString();
+
+        return view('admin.books.index', compact('books', 's', 'sort', 'dir'));
     }
+
 
 
     public function create(): View
@@ -75,7 +104,7 @@ class BookController extends Controller
     {
         $this->authorize('view', $book);
 
-        $book->load(['category','publisher','authors','seller']);
+        $book->load(['category', 'publisher', 'authors', 'seller']);
         return view('admin.books.show', compact('book'));
     }
 

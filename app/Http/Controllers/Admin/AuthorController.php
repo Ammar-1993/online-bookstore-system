@@ -16,22 +16,41 @@ class AuthorController extends Controller
 {
     public function index(Request $request): View
     {
-        $q = trim((string) $request->get('q',''));
+        $q = trim((string) $request->get('q', ''));
+        $sort = $request->get('sort', 'id');           // id | name | slug | books_count
+        $dir = strtolower($request->get('dir', 'desc')) === 'asc' ? 'asc' : 'desc';
 
-        $authors = Author::query()
+        // السماح فقط بهذه الحقول للفرز (أمان)
+        $allowedSorts = ['id', 'name', 'slug', 'books_count'];
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'id';
+        }
+
+        $query = Author::query()
             ->when($q !== '', function (Builder $b) use ($q) {
-                $b->where(fn($x) =>
-                    $x->where('name','like',"%{$q}%")
-                      ->orWhere('slug','like',"%{$q}%")
-                );
+                $b->where(function ($x) use ($q) {
+                    $x->where('name', 'like', "%{$q}%")
+                        ->orWhere('slug', 'like', "%{$q}%");
+                });
             })
-            ->withCount('books')
-            ->latest('id')
-            ->paginate(12)
-            ->withQueryString();
+            ->withCount('books');
 
-        return view('admin.authors.index', compact('authors','q'));
+        // تطبيق الترتيب
+        if ($sort === 'books_count') {
+            $query->orderBy('books_count', $dir);
+        } else {
+            $query->orderBy($sort, $dir);
+            // (اختياري) ترتيب عربي أدق:
+            // if (in_array($sort, ['name','slug'], true)) {
+            //   $query->orderByRaw("CONVERT($sort USING utf8mb4) COLLATE utf8mb4_ar_0900_ai_ci {$dir}");
+            // }
+        }
+
+        $authors = $query->paginate(12)->withQueryString();
+
+        return view('admin.authors.index', compact('authors', 'q', 'sort', 'dir'));
     }
+
 
     public function create(): View
     {
@@ -101,11 +120,12 @@ class AuthorController extends Controller
     private function uniqueSlug(?string $slug, string $name, ?int $ignoreId = null): string
     {
         $base = Str::slug($slug ?: $name, '-', 'ar') ?: Str::slug($name) ?: 'author';
-        $candidate = $base; $i = 2;
+        $candidate = $base;
+        $i = 2;
 
         while (
-            Author::when($ignoreId, fn($q)=>$q->where('id','!=',$ignoreId))
-                  ->where('slug',$candidate)->exists()
+            Author::when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
+                ->where('slug', $candidate)->exists()
         ) {
             $candidate = "{$base}-{$i}";
             $i++;

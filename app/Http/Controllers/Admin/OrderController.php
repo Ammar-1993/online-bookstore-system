@@ -22,47 +22,83 @@ class OrderController extends Controller
     public function index(Request $request): View
     {
         $validated = $request->validate([
-            'status'          => ['nullable', 'in:' . implode(',', self::STATUSES)],
-            'payment_status'  => ['nullable', 'in:' . implode(',', self::PAYMENT_STATUSES)],
-            'email'           => ['nullable', 'string', 'max:255'],
-            'from'            => ['nullable', 'date'],
-            'to'              => ['nullable', 'date'],
+            'status' => ['nullable', 'in:' . implode(',', self::STATUSES)],
+            'payment_status' => ['nullable', 'in:' . implode(',', self::PAYMENT_STATUSES)],
+            'email' => ['nullable', 'string', 'max:255'],
+            'from' => ['nullable', 'date'],
+            'to' => ['nullable', 'date'],
+            // ↓ اختيارية: لا نقيّدها بالـ validator حتى لا نرفض روابط يدوية
+            // 'sort'         => ['nullable', 'in:id,created_at,status,payment_status,user'],
+            // 'dir'          => ['nullable', 'in:asc,desc'],
         ]);
+
+        // فرز آمن
+        $sort = $request->get('sort', 'created_at');  // id | user | payment_status | status | created_at
+        $dir = strtolower($request->get('dir', 'desc')) === 'asc' ? 'asc' : 'desc';
+        $allowedSorts = ['id', 'user', 'payment_status', 'status', 'created_at'];
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'created_at';
+        }
 
         $orders = Order::query()
             ->with('user')
-            ->when(!empty($validated['status']), fn($q) =>
+            ->when(
+                !empty($validated['status']),
+                fn($q) =>
                 $q->where('status', $validated['status'])
             )
-            ->when(!empty($validated['payment_status']), fn($q) =>
+            ->when(
+                !empty($validated['payment_status']),
+                fn($q) =>
                 $q->where('payment_status', $validated['payment_status'])
             )
-            ->when(!empty($validated['email']), fn($q) =>
+            ->when(
+                !empty($validated['email']),
+                fn($q) =>
                 $q->whereHas('user', function ($uq) use ($validated) {
                     $email = trim((string) $validated['email']);
                     $uq->where('email', 'like', '%' . $email . '%');
                 })
             )
-            ->when(!empty($validated['from']), fn($q) =>
+            ->when(
+                !empty($validated['from']),
+                fn($q) =>
                 $q->where('created_at', '>=', $validated['from'] . ' 00:00:00')
             )
-            ->when(!empty($validated['to']), fn($q) =>
+            ->when(
+                !empty($validated['to']),
+                fn($q) =>
                 $q->where('created_at', '<=', $validated['to'] . ' 23:59:59')
             )
-            ->latest()
+
+            // تطبيق الفرز
+            ->when($sort === 'user', function ($q) use ($dir) {
+                $q->orderBy(
+                    \App\Models\User::select('name')
+                        ->whereColumn('users.id', 'orders.user_id'),
+                    $dir
+                );
+            }, function ($q) use ($sort, $dir) {
+                $q->orderBy($sort, $dir); // id | payment_status | status | created_at
+            })
+
             ->paginate(20)
             ->withQueryString();
 
-        return view('admin.orders.index', compact('orders') + [
+        return view('admin.orders.index', [
+            'orders' => $orders,
             'filters' => [
-                'status'         => $validated['status']         ?? null,
+                'status' => $validated['status'] ?? null,
                 'payment_status' => $validated['payment_status'] ?? null,
-                'email'          => $validated['email']          ?? null,
-                'from'           => $validated['from']           ?? null,
-                'to'             => $validated['to']             ?? null,
+                'email' => $validated['email'] ?? null,
+                'from' => $validated['from'] ?? null,
+                'to' => $validated['to'] ?? null,
             ],
+            'sort' => $sort,
+            'dir' => $dir,
         ]);
     }
+
 
     public function show(Order $order): View
     {
@@ -74,14 +110,14 @@ class OrderController extends Controller
     public function update(Request $request, Order $order): RedirectResponse
     {
         $data = $request->validate([
-            'status'          => ['required', 'string', 'in:' . implode(',', self::STATUSES)],
-            'payment_status'  => ['required', 'string', 'in:' . implode(',', self::PAYMENT_STATUSES)],
+            'status' => ['required', 'string', 'in:' . implode(',', self::STATUSES)],
+            'payment_status' => ['required', 'string', 'in:' . implode(',', self::PAYMENT_STATUSES)],
         ]);
 
-        $targetStatus   = $data['status'];
-        $targetPayment  = $data['payment_status'];
-        $oldStatus      = (string) $order->status;
-        $wasPaid        = ($order->payment_status === 'paid');
+        $targetStatus = $data['status'];
+        $targetPayment = $data['payment_status'];
+        $oldStatus = (string) $order->status;
+        $wasPaid = ($order->payment_status === 'paid');
 
         if ($targetPayment === 'paid' && $order->payment_status !== 'paid') {
             $order->markPaid();
@@ -94,7 +130,7 @@ class OrderController extends Controller
                 $order->status = $targetStatus;
                 $order->save();
 
-                if ($targetStatus === 'cancelled' && ! $wasPaid) {
+                if ($targetStatus === 'cancelled' && !$wasPaid) {
                     $order->user?->notify((new OrderCancelledNotification($order))->locale('ar'));
                 }
 
@@ -114,8 +150,8 @@ class OrderController extends Controller
 
         $data = $request->validate([
             'tracking_number' => ['required', 'string', 'max:190'],
-            'shipping_carrier'=> ['nullable', 'string', 'max:50'],
-            'tracking_url'    => ['nullable', 'url', 'max:500'],
+            'shipping_carrier' => ['nullable', 'string', 'max:50'],
+            'tracking_url' => ['nullable', 'url', 'max:500'],
         ]);
 
         $order->markShipped(
@@ -133,7 +169,7 @@ class OrderController extends Controller
     {
         $this->authorize('update', $order);
 
-        if ($order->payment_status !== 'paid' || ! $order->charge_id) {
+        if ($order->payment_status !== 'paid' || !$order->charge_id) {
             return back()->with('warning', 'لا يمكن استرجاع هذا الطلب.');
         }
 
@@ -141,7 +177,7 @@ class OrderController extends Controller
 
         try {
             $client->refunds->create([
-                'charge'   => $order->charge_id,
+                'charge' => $order->charge_id,
                 'metadata' => ['order_id' => (string) $order->id],
             ]);
 
@@ -152,10 +188,10 @@ class OrderController extends Controller
         } catch (\Throwable $e) {
             Log::error('admin refund failed', [
                 'order_id' => $order->id,
-                'err'      => $e->getMessage(),
+                'err' => $e->getMessage(),
             ]);
 
-            return back()->with('error', 'فشل الاسترجاع: '.$e->getMessage());
+            return back()->with('error', 'فشل الاسترجاع: ' . $e->getMessage());
         }
     }
 }

@@ -5,9 +5,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title', 'لوحة التحكم') - Online Bookstore</title>
-
-
-  
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -28,7 +25,7 @@
         <a href="{{ route('admin.authors.index') }}">المؤلفون</a>
         <a href="{{ route('admin.users.index') }}">المستخدمون</a>
         <a href="{{ route('admin.reviews.index') }}">المراجعات</a>
-        <a href="{{ route('admin.orders.index') }}">الطلبات</a>
+          <a href="{{ route('admin.orders.index') }}">الطلبات</a>
 
         @role('Seller')
         <a href="{{ route('admin.reviews.index') }}">مراجعات كتبي</a>
@@ -61,8 +58,8 @@
     @yield('content')
   </main>
 
-    {{-- داخل الـ body قبل إغلاقه مثلاً --}}
-    <x-page-loader />
+{{-- داخل الـ body قبل إغلاقه مثلاً --}}
+<x-page-loader />
 
 </body>
 

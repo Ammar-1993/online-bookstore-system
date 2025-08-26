@@ -15,24 +15,47 @@ use Illuminate\View\View;
 
 class CategoryController extends Controller
 {
+    // app/Http/Controllers/Admin/CategoryController.php
+
     public function index(Request $request): View
     {
         $q = trim((string) $request->get('q', ''));
+        $sort = $request->get('sort', 'id');         // id | name | books_count
+        $dir = strtolower($request->get('dir', 'desc')) === 'asc' ? 'asc' : 'desc';
 
-        $categories = Category::query()
+        // السماح فقط بهذه الحقول للفرز (أمانًا ومنعًا لأي حقن)
+        $allowedSorts = ['id', 'name', 'books_count'];
+        if (!in_array($sort, $allowedSorts, true)) {
+            $sort = 'id';
+        }
+
+        $query = Category::query()
             ->when($q !== '', function (Builder $builder) use ($q) {
-                $builder->where(fn ($x) =>
+                $builder->where(
+                    fn($x) =>
                     $x->where('name', 'like', "%{$q}%")
-                      ->orWhere('slug', 'like', "%{$q}%")
+                        ->orWhere('slug', 'like', "%{$q}%")
                 );
             })
-            ->withCount('books')
-            ->latest('id')
+            ->withCount('books');
+
+        // ترتيب النتائج
+        if ($sort === 'books_count') {
+            $query->orderBy('books_count', $dir);
+        } else {
+            $query->orderBy($sort, $dir);
+            // ملاحظة: لو واجهت ترتيب غير دقيق بالعربية مع name،
+            // يمكنك استخدام محرك/Collation مناسب (اختياري):
+            // $query->orderByRaw("CONVERT(name USING utf8mb4) COLLATE utf8mb4_ar_0900_ai_ci {$dir}");
+        }
+
+        $categories = $query
             ->paginate(12)
-            ->withQueryString();
+            ->withQueryString(); // يحافظ على q/sort/dir أثناء التنقل بين الصفحات
 
         return view('admin.categories.index', compact('categories', 'q'));
     }
+
 
     public function create(): View
     {
@@ -125,7 +148,7 @@ class CategoryController extends Controller
         $i = 2;
 
         while (
-            Category::when($ignoreId, fn ($q) => $q->where('id', '!=', $ignoreId))
+            Category::when($ignoreId, fn($q) => $q->where('id', '!=', $ignoreId))
                 ->where('slug', $candidate)
                 ->exists()
         ) {

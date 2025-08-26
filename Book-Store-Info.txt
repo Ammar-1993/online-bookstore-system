@@ -6,15 +6,17 @@ ammar@Ammar:/mnt/d/projects$ sudo apt update && sudo apt upgrade -y
 online-bookstore-system
 cd /mnt/d/projects
 
-./vendor/bin/sail down
-./vendor/bin/sail up -d
-./vendor/bin/sail npm run dev
-
 
 ./vendor/bin/sail artisan view:clear
 ./vendor/bin/sail artisan route:clear
 ./vendor/bin/sail artisan config:clear
 ./vendor/bin/sail artisan optimize:clear
+./vendor/bin/sail down
+./vendor/bin/sail up -d
+./vendor/bin/sail npm run dev
+
+
+
 
 powershell
  stripe listen --forward-to http://127.0.0.1:8080/payments/stripe/webhook --log-level info
