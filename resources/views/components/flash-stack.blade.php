@@ -1,6 +1,6 @@
 {{-- resources/views/components/flash-stack.blade.php --}}
 @props([
-  'duration' => 10000,  // ملّي ثانية: مدة الظهور الافتراضية
+  'duration' => 5000,  // ملّي ثانية: مدة الظهور الافتراضية
   'max'      => 8,      // أقصى عدد عناصر معروضة في آنٍ واحد
 ])
 
@@ -115,7 +115,7 @@
   const stackEl = document.getElementById('flash-stack');
   if (!stackEl) return;
 
-  const DEFAULT_DURATION = parseInt(stackEl.dataset.duration || '10000', 10);
+  const DEFAULT_DURATION = parseInt(stackEl.dataset.duration || '5000', 10);
   const MAX_COUNT = parseInt(stackEl.dataset.max || '8', 10);
 
   // أدوات

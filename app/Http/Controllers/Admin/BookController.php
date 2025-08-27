@@ -64,7 +64,7 @@ class BookController extends Controller
             // لا شيء، orderBy(id, desc) مطبق
         }
 
-        $books = $query->paginate(6)->withQueryString();
+        $books = $query->paginate(10)->withQueryString();
 
         return view('admin.books.index', compact('books', 's', 'sort', 'dir'));
     }

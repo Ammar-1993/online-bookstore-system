@@ -25,7 +25,7 @@
 
 <div class="mb-6">
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
-    <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-gray-100">الناشرون</h1>
+    <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-black-100">الناشرون</h1>
 
     <a href="{{ route('admin.publishers.create') }}"
        class="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-indigo-600 text-white shadow hover:bg-indigo-700"

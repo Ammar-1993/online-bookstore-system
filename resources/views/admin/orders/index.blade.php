@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="p-4">
-  <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-gray-100 mb-4">الطلبات</h1>
+  <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-black-100 mb-4">الطلبات</h1>
 
   {{-- نموذج الفلاتر --}}
   @php

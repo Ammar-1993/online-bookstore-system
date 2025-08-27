@@ -24,7 +24,7 @@
 @endphp
 
 <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-6">
-  <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-gray-100">المراجعات</h1>
+  <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-black-100">المراجعات</h1>
 
   {{-- بحث + فلتر الحالة (يحافظان على sort/dir) --}}
   <form method="GET" class="flex flex-col sm:flex-row gap-2 sm:items-center">
