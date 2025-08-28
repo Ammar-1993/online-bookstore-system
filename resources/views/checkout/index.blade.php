@@ -9,7 +9,7 @@
 <body class="bg-gray-50 text-gray-900">
 <header class="bg-white border-b">
   <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-    <a href="{{ route('home') }}" class="font-bold text-xl">متجر الكتب</a>
+    <a href="{{ route('home') }}" class="font-bold text-xl">المتجر الإلكتروني للكتب</a>
     <nav class="flex gap-3">
       <a class="hover:text-indigo-600" href="{{ route('cart.index') }}">السلة</a>
     </nav>

@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ $book->title }} - متجر الكتب</title>
+  <title>{{ $book->title }} - المتجر الإلكتروني للكتب</title>
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
@@ -12,7 +12,7 @@
   {{-- Header --}}
   <header class="bg-white border-b">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="{{ route('home') }}" class="font-bold text-xl">متجر الكتب</a>
+      <a href="{{ route('home') }}" class="font-bold text-xl">المتجر الإلكتروني للكتب</a>
       <nav class="flex gap-3 text-sm">
         <a class="hover:text-indigo-600" href="{{ route('home') }}">الرئيسية</a>
       </nav>

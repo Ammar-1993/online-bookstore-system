@@ -4,14 +4,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{{ $category->name }} - متجر الكتب</title>
+  <title>{{ $category->name }} - المتجر الإلكتروني للكتب</title>
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="bg-gray-50 text-gray-900">
   <header class="bg-white border-b">
     <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-      <a href="{{ route('home') }}" class="font-bold text-xl">متجر الكتب</a>
+      <a href="{{ route('home') }}" class="font-bold text-xl">المتجر الإلكتروني للكتب</a>
       <form action="" method="GET" class="flex gap-2">
         <input name="q" value="{{ request('q') }}" placeholder="ابحث داخل التصنيف"
           class="border rounded px-3 py-2 w-64">

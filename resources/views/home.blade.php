@@ -4,14 +4,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>متجر الكتب</title>
+    <title>المتجر الإلكتروني للكتب</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="bg-gray-50 text-gray-900">
     <header class="bg-white border-b">
         <div class="container mx-auto px-4 py-3 flex items-center gap-4 justify-between">
-            <a href="{{ route('home') }}" class="font-bold text-xl">متجر الكتب</a>
+            <a href="{{ route('home') }}" class="font-bold text-xl">المتجر الإلكتروني للكتب</a>
 
             {{-- ممكن تبقي الفورم هنا أو تحذفه لأن فيه واحد مشابه داخل المحتوى بالأسفل --}}
             <form action="{{ route('home') }}" method="GET" class="hidden md:flex items-center gap-2">

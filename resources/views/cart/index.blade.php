@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>سلة التسوق - متجر الكتب</title>
+    <title>سلة التسوق - المتجر الإلكتروني للكتب</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
 <body class="bg-gray-50 text-gray-900">
     <header class="bg-white border-b">
         <div class="container mx-auto px-4 py-3 flex items-center justify-between">
-            <a href="{{ route('home') }}" class="font-bold text-xl" data-ripple data-loader>متجر الكتب</a>
+            <a href="{{ route('home') }}" class="font-bold text-xl" data-ripple data-loader>المتجر الإلكتروني للكتب</a>
             <nav class="flex items-center gap-3 text-sm">
                 <a href="{{ route('home') }}" class="hover:text-indigo-600" data-ripple data-loader>الرئيسية</a>
             </nav>
