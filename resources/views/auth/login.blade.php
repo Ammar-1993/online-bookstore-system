@@ -27,11 +27,14 @@
             <div>
                 <x-label for="email" value="البريد الإلكتروني" class="mb-1 text-gray-700 dark:text-black-200 text-right" />
                 <div class="relative">
-                    <x-input id="email" class="block mt-1 w-full ps-12 pe-4 rounded-xl focus:ring-indigo-500 focus:border-indigo-500
-                   bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400" type="email"
-                        name="email" :value="old('email')" required autofocus autocomplete="username email"
-                        autocapitalize="off" spellcheck="false" inputmode="email" dir="ltr"
-                        placeholder="your@email.com" />
+                    <x-input id="email"   class="block mt-1 w-full ps-12 pe-4 rounded-xl bg-white text-gray-900 placeholder-gray-400
+                               ring-1 ring-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        type="email" name="email" :value="old('email')" required
+                        autocomplete="username" inputmode="email" autocapitalize="off" spellcheck="false"
+                        dir="ltr" placeholder="name@domain.com"
+                        aria-describedby="email_hint @error('email') email_error @enderror"
+                        aria-invalid="@error('email')true@enderror" />
+
                     {{-- أيقونة البريد: ملاصقة لبداية الحقل مع مسافة داخلية ps-12 --}}
                     <div class="pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
                         style="inset-inline-start:0.75rem" aria-hidden="true">
@@ -47,9 +50,12 @@
             <div class="mt-4">
                 <x-label for="password" value="كلمة المرور" class="mb-1 text-gray-700 dark:text-black-200 text-right" />
                 <div class="relative">
-                    <x-input id="password" class="block mt-1 w-full ps-12 pe-12 rounded-xl focus:ring-indigo-500 focus:border-indigo-500
-                   bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 placeholder-gray-400" type="password"
-                        name="password" required autocomplete="current-password" placeholder="••••••••" />
+                    <x-input id="password" class="block mt-1 w-full ps-12 pe-12 rounded-xl bg-white text-gray-900 placeholder-gray-400
+                               ring-1 ring-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        type="password" name="password" required autocomplete="new-password"
+                        placeholder="••••••••"
+                        aria-describedby="caps_hint @error('password') password_error @enderror"
+                        aria-invalid="@error('password')true@enderror" />
 
                     {{-- أيقونة ثابتة لبداية الحقل (قفل) + مسافة داخلية ps-12 --}}
                     <div class="pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
