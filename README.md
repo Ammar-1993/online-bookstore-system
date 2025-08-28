@@ -1,432 +1,469 @@
 # Online Bookstore System
 
-A modern, RTL-friendly bookstore built on **Laravel 12**, **PHP 8.4**, **MySQL**, **TailwindCSS**, **Livewire/Jetstream**, and **Stripe**.
-It includes a public catalog with search, product pages, reviews, a session-based cart, a checkout flow, user “My Orders” pages, an **Admin panel** with role-based access, **orders management** (including refunds via Stripe), **PDF invoices**, and **email notifications** (Mailpit in development).
+A modern, RTL-ready (Arabic) online bookstore built with **Laravel 12**, featuring a product catalog, cart & checkout, **Stripe** payments (test mode), invoice PDFs, email notifications via **Mailpit**, role-based admin panel (Admin/Seller/Customer), and a clean Tailwind CSS UI.
 
-> Default locale is **Arabic (RTL)**. All UI components are styled for RTL.
+![Laravel](https://img.shields.io/badge/Laravel-12.x-red) ![PHP](https://img.shields.io/badge/PHP-8.2+-purple) ![License](https://img.shields.io/badge/License-MIT-green)
 
 ---
 
-## Table of contents
+## Table of Contents
 
-* [Features](#features)
-* [Tech stack](#tech-stack)
-* [Project structure](#project-structure)
-* [Prerequisites](#prerequisites)
-* [Getting started (Sail/Docker)](#getting-started-saildocker)
-* [Configuration](#configuration)
+- [Screenshots](#screenshots)
+- [Features](#features)
+- [Tech Stack](#tech-stack)
+- [Requirements](#requirements)
+- [Quick Start (TL;DR)](#quick-start-tldr)
+- [Option A (Recommended): Docker via Laravel Sail](#option-a-recommended-docker-via-laravel-sail)
+  - [Step 1 — Clone & configure](#step-1--clone--configure)
+  - [Step 2 — Boot services](#step-2--boot-services)
+  - [Step 3 — App key, storage, and migrations](#step-3--app-key-storage-and-migrations)
+  - [Step 4 — Frontend assets](#step-4--frontend-assets)
+  - [Step 5 — Stripe (test mode) & webhook](#step-5--stripe-test-mode--webhook)
+  - [Useful Sail commands](#useful-sail-commands)
+  - [Windows + WSL2 tips](#windows--wsl2-tips)
+- [Option B: Native (No Docker)](#option-b-native-no-docker)
+- [Environment Variables](#environment-variables)
+- [Mailpit (Local Email)](#mailpit-local-email)
+- [Users & Roles](#users--roles)
+- [Queues (Optional but Recommended)](#queues-optional-but-recommended)
+- [Common Tasks](#common-tasks)
+- [Troubleshooting](#troubleshooting)
+- [Production Notes](#production-notes)
+- [Project Structure](#project-structure)
+- [Contributing](#contributing)
+- [Security](#security)
+- [License](#license)
 
-  * [.env essentials](#env-essentials)
-  * [Stripe (test mode)](#stripe-test-mode)
-  * [Mailpit (development mail)](#mailpit-development-mail)
-* [Daily development commands](#daily-development-commands)
-* [Database](#database)
-* [Auth, roles & policies](#auth-roles--policies)
-* [Business flows](#business-flows)
+---
 
-  * [Cart & checkout](#cart--checkout)
-  * [Order life-cycle](#order-life-cycle)
-  * [Invoices (PDF)](#invoices-pdf)
-  * [Email notifications](#email-notifications)
-* [Routes overview](#routes-overview)
-* [Admin panel](#admin-panel)
-* [Testing](#testing)
-* [Troubleshooting](#troubleshooting)
-* [Roadmap / Next steps](#roadmap--next-steps)
-* [License](#license)
+## Screenshots
+
+> Put your images under `docs/screenshots/` and commit them.  
+> The paths below are relative to the repo root and safe for GitHub preview.
+
+### Customer Experience
+
+| Home | Book Details |
+| --- | --- |
+| ![Home](docs/screenshots/home.png) | ![Book Details](docs/screenshots/book-details.png) |
+
+| Cart | Checkout |
+| --- | --- |
+| ![Cart](docs/screenshots/cart.png) | ![Checkout](docs/screenshots/checkout.png) |
+
+| Order Details | Payment (Stripe) |
+| --- | --- |
+| ![Order Details](docs/screenshots/order-details.png) | ![Stripe](docs/screenshots/stripe-payment.png) |
+
+### Admin Panel
+
+| Dashboard | Orders List |
+| --- | --- |
+| ![Admin Dashboard](docs/screenshots/admin-dashboard.png) | ![Admin Orders](docs/screenshots/admin-orders.png) |
+
+| Order Show | Mailpit (Emails) |
+| --- | --- |
+| ![Admin Order Show](docs/screenshots/admin-order-show.png) | ![Mailpit](docs/screenshots/mailpit.png) |
+
+> **Tip:** If you use Arabic/RTL screenshots, keep your app `<html dir="rtl">` for consistent rendering.
 
 ---
 
 ## Features
 
-* **Public storefront**
-
-  * Home catalog with search & pagination
-  * Book details with authors/publisher/category chips
-  * User reviews (CRUD) with average rating & count (approval supported)
-  * SEO-friendly slugs
-* **Cart & checkout**
-
-  * Session-based cart (add/update/remove/clear, currency consistency, stock checks)
-  * Checkout creates `Order` (pending/unpaid) + items
-  * “Mock pay now” for quick local testing
-  * Stripe card payments (test mode) with **webhook** confirmation & **refunds** from Admin
-* **Orders**
-
-  * “My Orders” list + details + cancel + invoices
-  * PDF invoices (Arabic/RTL compatible)
-  * Email notifications for key events (development via Mailpit)
-* **Admin panel**
-
-  * Manage Books, Categories, Publishers, Authors, Users
-  * Reviews moderation
-  * Orders management (filters, status/payment updates, refunds)
-* **Security & correctness**
-
-  * Policies for Admin/Seller/User separation
-  * Stock is **only** deducted on payment success (`markPaid()` with DB locks)
-  * Cancellation re-stocks when appropriate
-  * Webhook is CSRF-exempt & idempotent
+- 📚 **Catalog & search**: Books with categories, publishers, authors, cover images, stock, pricing.
+- 🛒 **Cart & checkout** with quantity controls and stock checks.
+- 💳 **Stripe Payments (test mode)** with **webhook** handling (`payment_intent.succeeded`, `charge.refunded`), idempotent intent creation, and robust order state transitions.
+- 🧾 **Invoice PDF** (mPDF) attached to payment confirmation emails.
+- 📬 **Email notifications** (order placed, paid, shipped, cancelled, status updated) via **Mailpit** in local/dev.
+- 👥 **RBAC** via Spatie Permission (Admin / Seller / Customer).
+- ⭐ **Reviews & ratings** with moderation (Admin/Seller).
+- 🌍 **RTL & Arabic**: Layouts are `dir="rtl"`, typography and emails tuned for Arabic.
+- ⚡ **UI niceties**: Page loader & button ripple, Tailwind CSS, Vite bundling.
+- 🧰 Admin panel: Orders, refunds (Stripe), shipping (tracking number, carrier, shipped state), inventory updates.
 
 ---
 
-## Tech stack
+## Tech Stack
 
-* **Backend:** PHP 8.4, Laravel 12.x, MySQL
-* **Auth/UI:** Jetstream, Fortify, Livewire
-* **Frontend:** Blade, Vite, TailwindCSS (RTL ready)
-* **Permissions:** `spatie/laravel-permission` (middleware aliases: `role`, `permission`, `role_or_permission`)
-* **Payments:** Stripe (PaymentIntents, CLI for webhooks)
-* **Mail (dev):** Mailpit
-* **PDF:** mPDF (UTF-8, Arabic fonts, RTL)
-* **Docker:** Laravel Sail
+- **Backend**: Laravel 12, PHP 8.2+
+- **Payments**: Stripe (test mode)
+- **DB/Cache**: MySQL 8+, Redis
+- **Frontend**: Tailwind CSS, Vite, (Alpine/Livewire/Jetstream if included)
+- **Email (local)**: Mailpit
+- **PDF**: mPDF
 
 ---
 
-## Screenshot
+## Requirements
 
-```
+**Common**
+- Git
+- Node.js **18+** and npm **9+**
+- Stripe account (test mode)
 
-## Prerequisites
+**Option A — Docker/Sail (Recommended)**
+- Docker Desktop (macOS/Windows) or Docker Engine (Linux)
+- (Windows) WSL2 with Ubuntu
 
-* **Docker** (for Laravel Sail)
-* **Node.js** (optional on host; `sail npm` can be used)
-* **Stripe CLI** (for local webhooks)
-
-  * Windows: `winget install --id=Stripe.StripeCli -e`
-* **WSL (Windows)** supported. Use **PowerShell** for Stripe CLI (host) and run Sail commands inside the project directory (WSL).
+**Option B — Native**
+- PHP **8.2+** with: `ctype`, `curl`, `dom`, `fileinfo`, `mbstring`, `openssl`, `pdo`, `tokenizer`, `xml`, `bcmath`, `gd`
+- Composer **2.5+**
+- MySQL **8+** (or MariaDB 10.6+)
+- (Optional) Redis 6+
 
 ---
 
-## Getting started (Sail/Docker)
-
-1. Install dependencies (composer already included in repo)
+## Quick Start (TL;DR)
 
 ```bash
-# from project root
+# 1) Clone
+git clone https://github.com/<org-or-user>/<repo>.git
+cd <repo>
+
+# 2) Copy env
 cp .env.example .env
-```
 
-2. Start containers
+# 3) Install dependencies
+composer install
+npm install
 
-```bash
+# 4) Run with Sail (Docker)
 ./vendor/bin/sail up -d
-```
 
-3. App key, migrations, seeders, storage
-
-```bash
+# 5) App key, storage, migrate
 ./vendor/bin/sail artisan key:generate
-./vendor/bin/sail artisan migrate --seed
 ./vendor/bin/sail artisan storage:link
+./vendor/bin/sail artisan migrate
+
+# 6) Build assets (dev)
+npm run dev
+
+# 7) Stripe webhook (adjust URL if not Sail)
+stripe listen --forward-to http://localhost/payments/stripe/webhook --log-level info
+# paste whsec_... into STRIPE_WEBHOOK_SECRET in .env
+
+# App at: http://localhost
+# Mailpit UI at: http://localhost:8025  (SMTP: 1025)
 ```
-
-4. Frontend
-
-```bash
-./vendor/bin/sail npm install
-./vendor/bin/sail npm run dev
-```
-
-5. Open the app: **[http://localhost:8080](http://localhost:8080)**
 
 ---
 
-## Configuration
+## Option A (Recommended): Docker via Laravel Sail
 
-### .env essentials
+### Step 1 — Clone & configure
 
-```env
-APP_URL=http://localhost:8080
-APP_PORT=8080
-APP_TIMEZONE=Asia/Aden
+```bash
+git clone https://github.com/<org-or-user>/<repo>.git
+cd <repo>
+cp .env.example .env
+composer install
+npm install
+```
+
+In `.env`, use the Sail service hosts:
+```dotenv
+APP_NAME="Online Bookstore"
+APP_ENV=local
+APP_URL=http://localhost
 
 DB_CONNECTION=mysql
 DB_HOST=mysql
 DB_PORT=3306
-DB_DATABASE=online_bookstore_db
+DB_DATABASE=bookstore
 DB_USERNAME=sail
 DB_PASSWORD=password
+
+REDIS_HOST=redis
 
 MAIL_MAILER=smtp
 MAIL_HOST=mailpit
 MAIL_PORT=1025
-MAIL_FROM_ADDRESS="no-reply@bookstore.test"
+MAIL_FROM_ADDRESS="no-reply@example.test"
 MAIL_FROM_NAME="${APP_NAME}"
 
-VITE_DEV_SERVER_HOST=0.0.0.0
-VITE_PORT=5173
-
-STRIPE_KEY=pk_test_xxxxxxxxxxxxxxxxxxxxx
-STRIPE_SECRET=sk_test_xxxxxxxxxxxxxxxxxxxxx
-STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxx
+STRIPE_KEY=pk_test_xxx
+STRIPE_SECRET=sk_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx   # fill after stripe listen
 ```
 
-> **Note:** Sail’s Mailpit UI is at **[http://localhost:8025](http://localhost:8025)** by default.
+### Step 2 — Boot services
 
-### Stripe (test mode)
+```bash
+./vendor/bin/sail up -d
+```
 
-1. Install & login (on host/PowerShell):
+> Default ports  
+> - App: **http://localhost**  
+> - Mailpit UI: **http://localhost:8025** (SMTP on **1025**)  
+> - MySQL: **3306**  
+> - Redis: **6379**
 
-```powershell
-winget install --id=Stripe.StripeCli -e
+If a port is **already in use**, stop the local service or edit `docker-compose.yml` to remap ports, then `sail down && sail up -d`.
+
+### Step 3 — App key, storage, and migrations
+
+```bash
+./vendor/bin/sail artisan key:generate
+./vendor/bin/sail artisan storage:link
+./vendor/bin/sail artisan migrate
+# ./vendor/bin/sail artisan db:seed   # if you have seeders
+```
+
+### Step 4 — Frontend assets
+
+```bash
+npm run dev   # development
+# or
+npm run build # production
+```
+
+### Step 5 — Stripe (test mode) & webhook
+
+Install Stripe CLI and log in:
+
+```bash
 stripe login
 ```
 
-2. Start webhook tunnel (use **127.0.0.1** to avoid host/WSL DNS edge cases):
-
-```powershell
-stripe listen --forward-to http://127.0.0.1:8080/payments/stripe/webhook --log-level info
-```
-
-Copy the printed `whsec_...` into `.env` as `STRIPE_WEBHOOK_SECRET`.
-
-3. Use Stripe test cards (e.g., `4242 4242 4242 4242`, any future date, any CVC).
-
-> **Important:** The webhook route is CSRF-exempt in `bootstrap/app.php`.
-
-### Mailpit (development mail)
-
-* UI: **[http://localhost:8025](http://localhost:8025)**
-* All emails (order placed/paid/cancelled/status updates) are delivered here in development.
-
----
-
-## Daily development commands
+Start a webhook listener that forwards to your app (Sail default URL):
 
 ```bash
-# run app
-./vendor/bin/sail up -d
+stripe listen --forward-to http://localhost/payments/stripe/webhook --log-level info
+```
 
-# clear caches (recommended after env/route/view changes)
-./vendor/bin/sail artisan view:clear
-./vendor/bin/sail artisan route:clear
-./vendor/bin/sail artisan config:clear
+Copy the printed `whsec_...` value into `.env` as `STRIPE_WEBHOOK_SECRET`, then try a test payment (e.g., card `4242 4242 4242 4242`, future date, any CVC). Verify:
+
+- Stripe Dashboard (test mode) shows the payment
+- `payment_intent.succeeded` → **200** in Stripe CLI logs
+- Order status updates to **paid / processing**
+- Stock decreases
+- A confirmation email (with PDF invoice) appears in **Mailpit** (`http://localhost:8025`)
+
+#### Useful Sail commands
+
+```bash
 ./vendor/bin/sail artisan optimize:clear
-
-# frontend dev server
+./vendor/bin/sail artisan route:list
+./vendor/bin/sail artisan tinker
+./vendor/bin/sail artisan queue:work
 ./vendor/bin/sail npm run dev
+./vendor/bin/sail npm run build
 
-# run test suite
-./vendor/bin/sail artisan test
+./vendor/bin/sail down
+./vendor/bin/sail restart
+```
+
+Add an **alias** to your shell for convenience:
+
+```bash
+alias sail='[ -f sail ] && sh sail || sh vendor/bin/sail'
+```
+
+#### Windows + WSL2 tips
+- Keep your project **inside the Linux filesystem** (e.g., `~/code/bookstore`) for performance.
+- Don’t run heavy operations from `/mnt/c` or `/mnt/d` paths.
+- Use `localhost` from Windows browser to reach Sail services.
+
+---
+
+## Option B: Native (No Docker)
+
+1. Install PHP 8.2+, Composer, Node 18+, and MySQL 8+.
+2. Clone & install:
+   ```bash
+   git clone https://github.com/<org-or-user>/<repo>.git
+   cd <repo>
+   cp .env.example .env
+   composer install
+   npm install
+   ```
+3. In `.env`, set your local DB credentials (e.g., `DB_HOST=127.0.0.1`) and mailer (Mailpit or other SMTP).
+4. Generate key, link storage, migrate:
+   ```bash
+   php artisan key:generate
+   php artisan storage:link
+   php artisan migrate
+   ```
+5. Start server & assets:
+   ```bash
+   php artisan serve
+   npm run dev
+   ```
+6. Stripe webhook (adjust URL to your serve port, e.g., `http://127.0.0.1:8000`):
+   ```bash
+   stripe listen --forward-to http://127.0.0.1:8000/payments/stripe/webhook --log-level info
+   ```
+   Paste `whsec_...` into `.env`.
+
+---
+
+## Environment Variables
+
+Key variables used by the app:
+
+```dotenv
+APP_NAME="Online Bookstore"
+APP_ENV=local
+APP_DEBUG=true
+APP_URL=http://localhost
+
+DB_CONNECTION=mysql
+DB_HOST=mysql           # 127.0.0.1 if native
+DB_PORT=3306
+DB_DATABASE=bookstore
+DB_USERNAME=sail
+DB_PASSWORD=password
+
+REDIS_HOST=redis        # 127.0.0.1 if native
+
+MAIL_MAILER=smtp
+MAIL_HOST=mailpit       # 127.0.0.1 if native
+MAIL_PORT=1025
+MAIL_FROM_ADDRESS="no-reply@example.test"
+MAIL_FROM_NAME="${APP_NAME}"
+
+STRIPE_KEY=pk_test_xxx
+STRIPE_SECRET=sk_test_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
 ```
 
 ---
 
-## Database
+## Mailpit (Local Email)
 
-* **Migrations** create the required tables: `books`, `orders`, `order_items`, `reviews`, …
-* `stock_qty` is authoritative for availability.
-* Orders store currency and computed totals; inventory is updated **only** when the order is marked paid.
+- UI: `http://localhost:8025`
+- SMTP: `mailpit:1025` (Sail) or `127.0.0.1:1025` (native)
+- All outgoing app emails appear here (order placed/paid/shipped/etc.), with Arabic & PDF attachments (when applicable).
 
 ---
 
-## Auth, roles & policies
+## Users & Roles
 
-* Roles via **spatie/laravel-permission**:
+The project uses **Spatie/Permission** with roles: **Admin**, **Seller**, **Customer**.
 
-  * **Admin**: full back-office access
-  * **Seller**: manage own books, moderate reviews for own books
-  * **User**: shop & manage own orders/reviews
-* Middleware aliases setup in `bootstrap/app.php`: `role`, `permission`, `role_or_permission`
-* Key policies:
-
-  * **OrderPolicy**: users can view/update **their own** orders; Admin can view/update all
-  * **ReviewPolicy**: create (verified users), update/delete (owner/Admin), moderate (Admin or owning Seller)
-  * **BookPolicy**: Admin all, Seller limited to own inventory
-
-> Ensure the `User` model has:
+- Register through the UI, then grant roles via your admin interface (or Tinker):
 
 ```php
-public function orders() { return $this->hasMany(\App\Models\Order::class); }
+// Example (Tinker):
+$user = \App\Models\User::where('email','you@example.com')->first();
+$user->assignRole('Admin'); // or 'Seller'
 ```
 
----
-
-## Business flows
-
-### Cart & checkout
-
-* **Cart** (`App\Support\Cart`):
-
-  * Session-based, keyed by `cart.items`
-  * `add/update/remove/clear/subtotal/currency`
-  * Prevents mixing different currencies
-  * Respects `stock_qty`
-* **Checkout**:
-
-  * `CheckoutController@store` creates **Order** with status `pending`, `payment_status=unpaid`
-  * No stock deduction at this point
-
-### Order life-cycle
-
-1. **pending/unpaid** — after checkout
-2. **Stripe payment**
-
-   * `StripeController@createIntent` creates a PaymentIntent
-   * User confirms payment on `/payments/stripe/{order}`
-3. **Webhook**: `payment_intent.succeeded`
-
-   * `Order::markPaid()` (inside a DB transaction + `lockForUpdate`)
-   * Deducts stock, sets `payment_status=paid`, `status=processing`, timestamps (`paid_at`)
-4. **Admin actions**
-
-   * Change status (`processing → shipped → …`)
-   * **Refund** → `charge.refunded` webhook → `cancelAndRestock()` → `payment_status=refunded`, `status=cancelled`
-
-### Invoices (PDF)
-
-* HTML invoice view + downloadable **PDF** (`/orders/{order}/invoice.pdf`)
-* Arabic/RTL support via mPDF (`utf-8`, `dejavusans`, `autoScriptToLang`, `autoLangToFont`)
-
-### Email notifications
-
-* Optional notifications (development → Mailpit):
-
-  * Order placed, paid, cancelled, status updated
-* You can attach the generated PDF to the “paid” email if desired.
+Some admin routes are protected by `role:Admin` or `role:Admin|Seller`.
 
 ---
 
-## Routes overview
+## Queues (Optional but Recommended)
 
-**Public**
+To send emails and heavy tasks asynchronously:
 
-* `/` — home (catalog, search, pagination)
-* `/books/{book:slug}` — book details
-* `/categories/{category:slug}`, `/publishers/{publisher:slug}`, `/authors/{author:slug}`
-
-**Cart**
-
-* `/cart` GET — list
-* `/cart/add/{book:slug}` POST — add
-* `/cart/{book:slug}` PATCH — update qty
-* `/cart/{book:slug}` DELETE — remove
-* `/cart` DELETE — clear
-
-**Checkout / Orders (auth + verified)**
-
-* `/checkout` GET — show cart summary
-* `/checkout` POST — create order
-* `/checkout/thanks` GET
-* `/orders` GET — My Orders
-* `/orders/{order}` GET — My Order details
-* `/orders/{order}/invoice` GET — HTML invoice
-* `/orders/{order}/invoice.pdf` GET — PDF invoice
-* `/orders/{order}/cancel` POST — cancel (when allowed)
-
-**Payments**
-
-* `/payments/mock/{order}/success` GET — mock markPaid (local only)
-* `/payments/stripe/{order}` GET — Stripe payment page
-* `/payments/stripe/{order}/intent` POST — create PaymentIntent
-* `/payments/stripe/webhook` POST — Stripe webhook (CSRF-exempt)
-
-**Admin (auth + role: Admin|Seller)**
-
-* `/admin` — dashboard
-* `/admin/books|categories|publishers|authors|users`
-* `/admin/reviews`
-* `/admin/orders` — list (with filters), show, update
-* `/admin/orders/{order}/refund` POST — refund (Admin only)
-
----
-
-## Admin panel
-
-* Orders list with filters: **status**, **payment\_status**, **date range**, **email**
-* Details page shows:
-
-  * PaymentIntent id, Charge id, `paid_at`
-  * Items with qty & totals
-  * Update controls for **order status** and **payment status**
-  * **Refund** button (Admin) — triggers Stripe refund + inventory restoration
-
----
-
-## Testing
-
-* Quick run:
+```dotenv
+QUEUE_CONNECTION=database
+```
 
 ```bash
-./vendor/bin/sail artisan test
+php artisan queue:table
+php artisan migrate
+# Run worker:
+# Sail:
+./vendor/bin/sail artisan queue:work
+# Native:
+php artisan queue:work
 ```
 
-* Suggested `./.env.testing`:
+---
 
-```env
-APP_ENV=testing
-APP_KEY=base64:testtesttesttesttesttesttesttesttesttesttest=
-DB_CONNECTION=sqlite
-DB_DATABASE=:memory:
-CACHE_DRIVER=array
-QUEUE_CONNECTION=sync
-SESSION_DRIVER=array
-STRIPE_KEY=pk_test_dummy
-STRIPE_SECRET=sk_test_dummy
-STRIPE_WEBHOOK_SECRET=whsec_test_secret
+## Common Tasks
+
+```bash
+# Clear caches
+php artisan optimize:clear
+
+# List routes
+php artisan route:list
+
+# Run tests (if provided)
+php artisan test
 ```
 
-* Feature tests include:
-
-  * Stripe webhook flow (paid/refunded) and inventory adjustments
-  * Order policy (ownership/Admin access)
-  * Admin orders filters
-  * “My Orders” page visibility
+With Sail, prefix commands with `./vendor/bin/sail`.
 
 ---
 
 ## Troubleshooting
 
-* **Webhook received but order doesn’t change**
+- **`vendor/bin/sail: No such file or directory`**  
+  Run `composer install` first. Ensure `vendor/` exists.
 
-  * Ensure Stripe CLI uses **127.0.0.1** (not localhost):
+- **Ports (3306, 1025, 8025) already in use**  
+  Stop local MySQL/Mailpit or edit `docker-compose.yml` to remap, then `sail down && sail up -d`.
 
-    ```
-    stripe listen --forward-to http://127.0.0.1:8080/payments/stripe/webhook
-    ```
-  * Check `.env` has correct `STRIPE_WEBHOOK_SECRET`
-  * Verify the webhook route is **CSRF-exempt** in `bootstrap/app.php`
-  * Check app logs: `./vendor/bin/sail artisan tail`
+- **Stripe “Invalid signature” (400)**  
+  Make sure `STRIPE_WEBHOOK_SECRET` matches the most recent `stripe listen` session output.
 
-* **419/CSRF on creating intent**
+- **Slow responses locally**  
+  - Move project **inside** WSL’s Linux filesystem (not `/mnt/c` or `/mnt/d`).
+  - Disable Xdebug.
+  - Cache config/routes (`php artisan config:cache`, `route:cache`) in non-dev.
 
-  * The `fetch` request on the Stripe page uses same-origin relative URL and includes `X-CSRF-TOKEN` — ensure you didn’t change the route or domain.
-
-* **Stock didn’t change**
-
-  * Stock is deducted only on `payment_intent.succeeded` → `Order::markPaid()`
-  * Make sure you’re not intercepting the webhook with a wrong secret.
-
-* **Mail not received**
-
-  * Open Mailpit: **[http://localhost:8025](http://localhost:8025)**
-  * Verify `MAIL_HOST=mailpit`, `MAIL_PORT=1025`, and `MAIL_MAILER=smtp`.
-
-* **Windows/WSL specifics**
-
-  * Run Stripe CLI from **PowerShell** on the host.
-  * Run Sail commands inside WSL project folder.
-  * Prefer `127.0.0.1` in webhook forwarding.
-
-* **Compile assets**
-
-  * `./vendor/bin/sail npm run dev`
-  * If Vite HMR issues: restart Vite and refresh.
+- **Emails not showing**  
+  Confirm Mailpit is running and `.env` points to it. Check `queue:work` if queued.
 
 ---
 
-## Roadmap / Next steps
+## Production Notes
 
-* Shipping workflow:
-
-  * `tracking_number` on orders
-  * Mark as `shipped` with email “Your order has shipped”
-* Sequential invoice numbering (`IN-000001…`)
-* Coupons/discounts, taxes, shipping methods
-* Inventory reservations / cancellation timeouts
-* Full i18n (Arabic/English switch)
+- Use a real SMTP provider (Mailgun, SES, etc.) instead of Mailpit.
+- Set `APP_ENV=production`, `APP_DEBUG=false`, correct `APP_URL`.
+- Run `php artisan migrate --force`.
+- Build assets: `npm run build`.
+- Set up queue workers (Supervisor or systemd).
+- Configure an HTTPS domain, real Stripe webhook endpoint in the Stripe Dashboard.
+- Harden permissions on `storage/` and `bootstrap/cache/`.
 
 ---
 
+## Project Structure
 
+```
+app/
+  Http/
+    Controllers/         # Web & Admin controllers (orders, payments, reviews, etc.)
+  Models/                # Book, Order, OrderItem, Review, ...
+  Notifications/         # OrderPaid, OrderShipped, etc. (Arabic-friendly)
+config/
+  shipping.php           # (optional) tracking URL patterns per carrier
+database/
+  migrations/            # Tables, shipping columns, RBAC, etc.
+public/
+resources/
+  views/                 # RTL-ready Blade templates (admin, shop, emails)
+  js/, css/              # Vite/Tailwind sources
+routes/
+  web.php                # Web routes (including /payments/stripe/webhook)
+```
+
+---
+
+## Contributing
+
+Contributions are welcome!  
+Please open an issue to discuss changes, then submit a PR with clear commits and descriptions.
+
+---
+
+## Security
+
+If you discover a security issue, please **do not** open a public issue.  
+Email the maintainer directly and allow reasonable time for a fix.
+
+---
+
+## License
+
+This project is open-sourced software licensed under the **MIT license**.
+
+---
+
+**Enjoy!** Spin it up with **Sail**, test a Stripe payment, and check Mailpit for emails & invoices. The UI is RTL-aware out of the box—happy building!
