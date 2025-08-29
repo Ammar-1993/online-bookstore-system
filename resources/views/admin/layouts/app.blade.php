@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title', 'المتجر الإلكتروني للكتب') - Online Bookstore</title>
   @vite(['resources/css/app.css', 'resources/js/app.js'])
+  @livewireStyles
+
 </head>
 
 <body class="bg-gray-50 text-gray-900">
@@ -76,14 +78,14 @@
 
           {{-- Actions --}}
           <div class="flex items-center gap-2">
-            <a href="{{ route('admin.books.create') }}"
+            <!-- <a href="{{ route('admin.books.create') }}"
               class="hidden sm:inline-flex items-center gap-2 rounded-xl px-3 py-1.5 bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm"
               data-ripple data-loader>
               <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none">
                 <path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
               </svg>
               إضافة كتاب
-            </a>
+            </a> -->
 
             <a href="{{ route('home') }}"
               class="inline-flex items-center rounded-full px-2.5 py-1 text-xs bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300"
@@ -117,19 +119,66 @@
                   <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                 </svg>
               </button>
-              <div id="user-menu"
-                class="absolute end-0 mt-2 w-48 rounded-xl overflow-hidden border border-black/5 dark:border-white/10 bg-white dark:bg-gray-900 shadow-lg hidden">
-                <div class="px-3 py-2 text-xs text-gray-500 dark:text-gray-400">مسجّل دخولاً</div>
-                <div class="px-3 pb-2 text-sm truncate">{{ $u?->email }}</div>
-                <div class="border-t border-black/5 dark:border-white/10"></div>
-                <form method="POST" action="{{ route('logout') }}" class="p-2">@csrf
-                  <button
-                    class="w-full text-start px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-sm"
-                    data-ripple>
-                    تسجيل الخروج
-                  </button>
-                </form>
-              </div>
+          @php($u = $u ?? auth()->user())
+<div
+  id="user-menu"
+  class="absolute end-0 mt-2 w-56 rounded-xl overflow-hidden border border-black/5 dark:border-white/10 bg-white dark:bg-gray-900 shadow-lg hidden"
+  role="menu"
+  aria-hidden="true"
+>
+  {{-- رأس مختصر: الاسم + الإيميل --}}
+  <div class="px-3 py-3 flex items-center gap-3">
+    <div class="h-9 w-9 rounded-full bg-indigo-600 text-white grid place-items-center text-sm">
+      {{ mb_substr($u?->name ?? $u?->email ?? 'U', 0, 1) }}
+    </div>
+    <div class="min-w-0">
+      <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ $u?->name ?? '—' }}</div>
+      <div class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $u?->email }}</div>
+    </div>
+  </div>
+
+  <div class="border-t border-black/5 dark:border-white/10"></div>
+
+  {{-- رابط حسابي (ملف شخصي داخل لوحة الإدارة) --}}
+  <a href="{{ route('admin.profile') }}"
+     class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-gray-800 dark:text-gray-100"
+     role="menuitem"
+     data-ripple data-loader>
+    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4 0-7 2-7 4v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1c0-2-3-4-7-4Z" stroke="currentColor" stroke-width="2"/>
+    </svg>
+    حسابي
+  </a>
+
+  {{-- (اختياري) رابط سريع للوحة التحكم --}}
+  <a href="{{ route('admin.dashboard') }}"
+     class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-gray-800 dark:text-gray-100"
+     role="menuitem"
+     data-ripple>
+    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M3 13h8V3H3v10Zm10 8h8V3h-8v18ZM3 21h8v-6H3v6Z" stroke="currentColor" stroke-width="2"/>
+    </svg>
+    لوحة التحكم
+  </a>
+
+  <div class="border-t border-black/5 dark:border-white/10"></div>
+
+  {{-- تسجيل الخروج --}}
+  <form method="POST" action="{{ route('logout') }}" class="p-2" role="none">
+    @csrf
+    <button type="submit"
+            class="w-full text-start flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-red-600"
+            role="menuitem"
+            data-ripple data-loader>
+      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M15 17l5-5-5-5M20 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M12 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      تسجيل الخروج
+    </button>
+  </form>
+</div>
+
             </div>
           </div>
         </div>
@@ -208,6 +257,10 @@
 
   {{-- داخل الـ body قبل إغلاقه مثلاً --}}
   <x-page-loader />
+
+  @livewireScripts
+  @stack('modals')
+
 
 </body>
 

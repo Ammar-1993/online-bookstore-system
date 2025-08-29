@@ -95,7 +95,7 @@
           <td class="px-4 py-3">
             <div class="flex items-center gap-1">
               <a href="{{ route('admin.categories.edit', $cat) }}"
-                 class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-amber-500 text-white hover:bg-amber-600"
+                 class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700"
                  title="تعديل" data-ripple data-loader>
                 <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none"><path d="M4 21h4l11-11a2.828 2.828 0 1 0-4-4L4 17v4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 <span class="hidden sm:inline">تعديل</span>

@@ -424,28 +424,6 @@ With Sail, prefix commands with `./vendor/bin/sail`.
 
 ---
 
-## Project Structure
-
-```
-app/
-  Http/
-    Controllers/         # Web & Admin controllers (orders, payments, reviews, etc.)
-  Models/                # Book, Order, OrderItem, Review, ...
-  Notifications/         # OrderPaid, OrderShipped, etc. (Arabic-friendly)
-config/
-  shipping.php           # (optional) tracking URL patterns per carrier
-database/
-  migrations/            # Tables, shipping columns, RBAC, etc.
-public/
-resources/
-  views/                 # RTL-ready Blade templates (admin, shop, emails)
-  js/, css/              # Vite/Tailwind sources
-routes/
-  web.php                # Web routes (including /payments/stripe/webhook)
-```
-
----
-
 ## Contributing
 
 Contributions are welcome!  

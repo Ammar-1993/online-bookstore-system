@@ -22,7 +22,7 @@
 
         <div class="mt-3 max-w-xl text-sm text-gray-600">
             <p>
-                {{ __('When two factor authentication is enabled, you will be prompted for a secure, random token during authentication. You may retrieve this token from your phone\'s Google Authenticator application.') }}
+                {{ __('عند تفعيل المصادقة الثنائية، سيُطلب منك إدخال رمز عشوائي وآمن أثناء المصادقة. يمكنك استرداد هذا الرمز من تطبيق Google Authenticator على هاتفك.') }}
             </p>
         </div>
 

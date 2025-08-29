@@ -3,14 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use App\Http\Controllers\ReviewController;
-use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
-use App\Http\Controllers\CartController;
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\PaymentController;
-use App\Http\Controllers\StripeController;
 
-// الواجهة العامة
+// Front Controllers
 use App\Http\Controllers\{
     HomeController,
     BookController,
@@ -20,7 +14,17 @@ use App\Http\Controllers\{
     OrderController
 };
 
-// لوحة التحكم (Admin)
+// Reviews
+use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Admin\ReviewController as AdminReviewController;
+
+// Cart / Checkout / Payments
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\StripeController;
+
+// Admin Controllers
 use App\Http\Controllers\Admin\{
     DashboardController,
     BookController as AdminBookController,
@@ -28,7 +32,8 @@ use App\Http\Controllers\Admin\{
     PublisherController as AdminPublisherController,
     AuthorController as AdminAuthorController,
     UserController as AdminUserController,
-    OrderController as AdminOrderController
+    OrderController as AdminOrderController,
+    profileController as AdminProfileController
 };
 
 /*
@@ -43,36 +48,41 @@ Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->
 Route::get('/publishers/{publisher:slug}', [PublisherController::class, 'show'])->name('publishers.show');
 Route::get('/authors/{author:slug}', [AuthorController::class, 'show'])->name('authors.show');
 
-// Cart
+/*
+|--------------------------------------------------------------------------
+| عربة التسوق
+|--------------------------------------------------------------------------
+*/
 Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
 Route::post('/cart/add/{book:slug}', [CartController::class, 'add'])->name('cart.add');
 Route::patch('/cart/{book:slug}', [CartController::class, 'update'])->name('cart.update');
 Route::delete('/cart/{book:slug}', [CartController::class, 'remove'])->name('cart.remove');
 Route::delete('/cart', [CartController::class, 'clear'])->name('cart.clear');
 
-// Checkout + طلبات العميل
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
-    ->group(function () {
-        Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
-        Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
-        Route::get('/checkout/thanks', [CheckoutController::class, 'thankyou'])->name('checkout.thankyou');
+/*
+|--------------------------------------------------------------------------
+| Checkout + طلبات العميل (يتطلب تسجيل دخول + تحقق البريد)
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
+    // Checkout
+    Route::get('/checkout', [CheckoutController::class, 'show'])->name('checkout.show');
+    Route::post('/checkout', [CheckoutController::class, 'store'])->name('checkout.store');
+    Route::get('/checkout/thanks', [CheckoutController::class, 'thankyou'])->name('checkout.thankyou');
 
-        // طلباتي (عميل)
-        Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
-        Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    // طلباتي
+    Route::get('/orders', [OrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
+    Route::get('/orders/{order}/status', [OrderController::class, 'status'])->name('orders.status');
 
-        // ✅ نقطة استعلام حالة الطلب (يستعملها الـ polling بعد الدفع)
-        Route::get('/orders/{order}/status', [OrderController::class, 'status'])->name('orders.status');
+    // فواتير
+    Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
+    Route::get('/orders/{order}/invoice.pdf', [OrderController::class, 'invoicePdf'])->name('orders.invoice.pdf');
 
-        Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
-        Route::get('/orders/{order}/invoice.pdf', [OrderController::class, 'invoicePdf'])->name('orders.invoice.pdf');
-
-        // تأكيد دفع تجريبي
-        Route::get('/payments/mock/{order}/success', [PaymentController::class, 'mockSuccess'])->name('payments.mock.success');
-
-        // إلغاء طلب
-        Route::post('/orders/{order}/cancel', [PaymentController::class, 'cancel'])->name('orders.cancel');
-    });
+    // نقاط دفع/إلغاء تجريبية
+    Route::get('/payments/mock/{order}/success', [PaymentController::class, 'mockSuccess'])->name('payments.mock.success');
+    Route::post('/orders/{order}/cancel', [PaymentController::class, 'cancel'])->name('orders.cancel');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -87,16 +97,19 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 
 /*
 |--------------------------------------------------------------------------
-| مسارات التحقق من البريد
+| مسارات التحقق من البريد (Jetstream / Fortify)
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
     Route::get('/email/verify', fn() => view('auth.verify-email'))->name('verification.notice');
 
-    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-        $request->fulfill();
-        return redirect()->route('dashboard');
-    })->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+    Route::get(
+        '/email/verify/{id}/{hash}',
+        function (EmailVerificationRequest $request) {
+            $request->fulfill();
+            return redirect()->route('dashboard');
+        }
+    )->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 
     Route::post('/email/verification-notification', function (Request $request) {
         $request->user()->sendEmailVerificationNotification();
@@ -104,31 +117,38 @@ Route::middleware('auth')->group(function () {
     })->middleware(['throttle:6,1'])->name('verification.send');
 });
 
-
 /*
 |--------------------------------------------------------------------------
 | لوحة التحكم / الإدارة
 |--------------------------------------------------------------------------
+| ملاحظة: تأكد من تعريف وسطاء Spatie كـ alias في bootstrap/app.php:
+| 'role', 'permission', 'role_or_permission'
 */
 Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'role:Admin|Seller'])
     ->group(function () {
+        // Dashboard (Controller invokable)
         Route::get('/', DashboardController::class)->name('dashboard');
 
+        // NEW: Admin Profile
+        Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile');
+
+        // كتب (Seller يدير كتبه عبر Policy، Admin الكل)
         Route::resource('books', AdminBookController::class);
 
+        // مراجعات (للعرض والإدارة)
         Route::get('/reviews', [AdminReviewController::class, 'index'])->name('reviews.index');
         Route::patch('/reviews/{review}/toggle', [AdminReviewController::class, 'toggle'])->name('reviews.toggle');
         Route::delete('/reviews/{review}', [AdminReviewController::class, 'destroy'])->name('reviews.destroy');
 
+        // الطلبات (إدارة)
         Route::resource('orders', AdminOrderController::class)->only(['index', 'show', 'update']);
         Route::post('/orders/{order}/refund', [AdminOrderController::class, 'refund'])
             ->middleware('role:Admin')->name('orders.refund');
-        // ✅ شحن الطلب (تعيين رقم تتبع وإرسال بريد)
-        Route::post('/orders/{order}/ship', [AdminOrderController::class, 'ship'])
-            ->name('orders.ship');
+        Route::post('/orders/{order}/ship', [AdminOrderController::class, 'ship'])->name('orders.ship');
 
+        // موارد المشرف فقط
         Route::middleware('role:Admin')->group(function () {
             Route::resource('categories', AdminCategoryController::class)->except('show');
             Route::resource('publishers', AdminPublisherController::class)->except('show');
@@ -137,15 +157,38 @@ Route::prefix('admin')
         });
     });
 
-Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
-    ->get('/dashboard', fn() => view('dashboard'))
-    ->name('dashboard');
-
-Route::fallback(fn() => abort(404));
-
-// Stripe (الدفع)
+/*
+|--------------------------------------------------------------------------
+| Stripe (الدفع)
+|--------------------------------------------------------------------------
+*/
+// صفحات الدفع عبر Stripe (للمستخدمين المسجّلين)
 Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
     Route::get('/payments/stripe/{order}', [StripeController::class, 'pay'])->name('payments.stripe.pay');
     Route::post('/payments/stripe/{order}/intent', [StripeController::class, 'createIntent'])->name('payments.stripe.intent');
 });
+// Webhook عام (بدون مصادقة)
 Route::post('/payments/stripe/webhook', [StripeController::class, 'webhook'])->name('payments.stripe.webhook');
+
+/*
+|--------------------------------------------------------------------------
+| Dashboard بعد تسجيل الدخول
+|--------------------------------------------------------------------------
+| تحويل تلقائي: Admin/Seller => لوحة الإدارة، غير ذلك => dashboard الافتراضي.
+*/
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])
+    ->get('/dashboard', function () {
+        $user = auth()->user();
+        if ($user && $user->hasAnyRole(['Admin', 'Seller'])) {
+            return redirect()->route('admin.dashboard');
+        }
+        return view('dashboard');
+    })
+    ->name('dashboard');
+
+/*
+|--------------------------------------------------------------------------
+| Fallback (اجعله أخيرًا دومًا)
+|--------------------------------------------------------------------------
+*/
+Route::fallback(fn() => abort(404));

@@ -32,7 +32,7 @@
                     <a href="{{ route('register') }}" class="hover:text-indigo-600">تسجيل</a>
                 @endauth
                 <a href="{{ route('cart.index') }}" class="relative hover:text-indigo-600">
-                    العربة
+                    السلة
                     <span
                         class="absolute -top-2 -left-3 text-xs bg-indigo-600 text-white rounded px-1">{{ $cartCount ?? 0 }}</span>
                 </a>
