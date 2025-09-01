@@ -51,6 +51,15 @@
             <a class="{{ $base }} {{ $is('admin.dashboard') ? $active : '' }}"
               href="{{ route('admin.dashboard') }}">لوحة التحكم</a>
 
+            @if($isSeller && !$isAdmin)
+              <a class="{{ $base }} {{ $is('admin.reviews.*') ? $active : '' }}"
+                href="{{ route('admin.reviews.index') }}">مراجعات كتبي</a>
+            @endif
+
+            {{-- للجميع --}}
+            <a class="{{ $base }} {{ $is('admin.books.*') ? $active : '' }}"
+              href="{{ route('admin.books.index') }}">الكتب</a>
+
             @if($isAdmin)
               <a class="{{ $base }} {{ $is('admin.categories.*') ? $active : '' }}"
                 href="{{ route('admin.categories.index') }}">التصنيفات</a>
@@ -66,14 +75,7 @@
                 href="{{ route('admin.orders.index') }}">الطلبات</a>
             @endif
 
-            @if($isSeller && !$isAdmin)
-              <a class="{{ $base }} {{ $is('admin.reviews.*') ? $active : '' }}"
-                href="{{ route('admin.reviews.index') }}">مراجعات كتبي</a>
-            @endif
 
-            {{-- للجميع --}}
-            <a class="{{ $base }} {{ $is('admin.books.*') ? $active : '' }}"
-              href="{{ route('admin.books.index') }}">الكتب</a>
           </nav>
 
           {{-- Actions --}}
@@ -119,65 +121,63 @@
                   <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
                 </svg>
               </button>
-          @php($u = $u ?? auth()->user())
-<div
-  id="user-menu"
-  class="absolute end-0 mt-2 w-56 rounded-xl overflow-hidden border border-black/5 dark:border-white/10 bg-white dark:bg-gray-900 shadow-lg hidden"
-  role="menu"
-  aria-hidden="true"
->
-  {{-- رأس مختصر: الاسم + الإيميل --}}
-  <div class="px-3 py-3 flex items-center gap-3">
-    <div class="h-9 w-9 rounded-full bg-indigo-600 text-white grid place-items-center text-sm">
-      {{ mb_substr($u?->name ?? $u?->email ?? 'U', 0, 1) }}
-    </div>
-    <div class="min-w-0">
-      <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ $u?->name ?? '—' }}</div>
-      <div class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $u?->email }}</div>
-    </div>
-  </div>
+              @php($u = $u ?? auth()->user())
+              <div id="user-menu"
+                class="absolute end-0 mt-2 w-56 rounded-xl overflow-hidden border border-black/5 dark:border-white/10 bg-white dark:bg-gray-900 shadow-lg hidden"
+                role="menu" aria-hidden="true">
+                {{-- رأس مختصر: الاسم + الإيميل --}}
+                <div class="px-3 py-3 flex items-center gap-3">
+                  <div class="h-9 w-9 rounded-full bg-indigo-600 text-white grid place-items-center text-sm">
+                    {{ mb_substr($u?->name ?? $u?->email ?? 'U', 0, 1) }}
+                  </div>
+                  <div class="min-w-0">
+                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100 truncate">{{ $u?->name ?? '—' }}
+                    </div>
+                    <div class="text-xs text-gray-500 dark:text-gray-400 truncate">{{ $u?->email }}</div>
+                  </div>
+                </div>
 
-  <div class="border-t border-black/5 dark:border-white/10"></div>
+                <div class="border-t border-black/5 dark:border-white/10"></div>
 
-  {{-- رابط حسابي (ملف شخصي داخل لوحة الإدارة) --}}
-  <a href="{{ route('admin.profile') }}"
-     class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-gray-800 dark:text-gray-100"
-     role="menuitem"
-     data-ripple data-loader>
-    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4 0-7 2-7 4v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1c0-2-3-4-7-4Z" stroke="currentColor" stroke-width="2"/>
-    </svg>
-    حسابي
-  </a>
+                {{-- رابط حسابي (ملف شخصي داخل لوحة الإدارة) --}}
+                <a href="{{ route('admin.profile') }}"
+                  class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-gray-800 dark:text-gray-100"
+                  role="menuitem" data-ripple data-loader>
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5Zm0 2c-4 0-7 2-7 4v1a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1c0-2-3-4-7-4Z"
+                      stroke="currentColor" stroke-width="2" />
+                  </svg>
+                  حسابي
+                </a>
 
-  {{-- (اختياري) رابط سريع للوحة التحكم --}}
-  <a href="{{ route('admin.dashboard') }}"
-     class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-gray-800 dark:text-gray-100"
-     role="menuitem"
-     data-ripple>
-    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-      <path d="M3 13h8V3H3v10Zm10 8h8V3h-8v18ZM3 21h8v-6H3v6Z" stroke="currentColor" stroke-width="2"/>
-    </svg>
-    لوحة التحكم
-  </a>
+                {{-- (اختياري) رابط سريع للوحة التحكم --}}
+                <a href="{{ route('admin.dashboard') }}"
+                  class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-gray-800 dark:text-gray-100"
+                  role="menuitem" data-ripple>
+                  <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path d="M3 13h8V3H3v10Zm10 8h8V3h-8v18ZM3 21h8v-6H3v6Z" stroke="currentColor" stroke-width="2" />
+                  </svg>
+                  لوحة التحكم
+                </a>
 
-  <div class="border-t border-black/5 dark:border-white/10"></div>
+                <div class="border-t border-black/5 dark:border-white/10"></div>
 
-  {{-- تسجيل الخروج --}}
-  <form method="POST" action="{{ route('logout') }}" class="p-2" role="none">
-    @csrf
-    <button type="submit"
-            class="w-full text-start flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-red-600"
-            role="menuitem"
-            data-ripple data-loader>
-      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-        <path d="M15 17l5-5-5-5M20 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M12 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="2"/>
-      </svg>
-      تسجيل الخروج
-    </button>
-  </form>
-</div>
+                {{-- تسجيل الخروج --}}
+                <form method="POST" action="{{ route('logout') }}" class="p-2" role="none">
+                  @csrf
+                  <button type="submit"
+                    class="w-full text-start flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-red-600"
+                    role="menuitem" data-ripple data-loader>
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                      <path d="M15 17l5-5-5-5M20 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" />
+                      <path d="M12 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="2" />
+                    </svg>
+                    تسجيل الخروج
+                  </button>
+                </form>
+              </div>
 
             </div>
           </div>
