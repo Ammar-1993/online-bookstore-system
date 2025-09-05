@@ -36,36 +36,253 @@ A modern, RTL-ready (Arabic) online bookstore built with **Laravel 12**, featuri
 
 ---
 
-## Screenshots
+Screenshots
+Tip: keep all images under docs/screenshots/ and use consistent naming like 01-home.png, 02-category.png, … to match the order below.
+Storefront (Public)
+1) Home (Landing & Featured)
+Route: /
+Access: Public
+Purpose: First contact with the bookstore; highlight featured/new books and entry paths.
+Capture: Top navigation, hero (if any), featured books grid, footer.
+Key UI: Search, categories link, book cards (cover, title, price, currency), RTL layout.
+________________________________________
+2) Category Details
+Route: /categories/{slug}
+Access: Public
+Purpose: Browse books by category.
+Capture: Category title/description, filter/sort (if present), paginated grid.
+Key UI: Book cards, RTL pagination, breadcrumbs back to Home.
+________________________________________
+3) Publisher Details
+Route: /publishers/{slug}
+Access: Public
+Purpose: Showcase books from a specific publisher.
+Capture: Publisher header (name/logo if available), books list, pagination.
+Key UI: Book cards with price/currency, consistent RTL spacing.
+________________________________________
+4) Author Details
+Route: /authors/{slug}
+Access: Public
+Purpose: Show an author profile and books by that author.
+Capture: Author name/bio (if present), books grid.
+Key UI: Book cards, RTL typography and avatars (if used).
+________________________________________
+5) Book Details (+ Reviews)
+Route: /books/{slug}
+Access: Public
+Purpose: Product page for a book; add to cart; view/add reviews.
+Capture: Cover, title, author/publisher, price/currency, stock, add-to-cart button, reviews block.
+Key UI: Star rating display, review list (approved only), “write/update review” (for verified users), related books strip.
+________________________________________
+6) Cart
+Route: /cart
+Access: Public
+Purpose: Review items, edit quantities, remove/clear, proceed to checkout.
+Capture: Table of items (cover, title, unit price, qty, line total), totals box, “Proceed to Checkout”.
+Key UI: Quantity update form, delete buttons, empty-state card, RTL table.
+________________________________________
+7) Checkout
+Route: /checkout
+Access: Authenticated
+Purpose: Capture shipping/billing details and confirm order before payment.
+Capture: Shipping form, summary of items, totals, “Pay with Stripe (test)” CTA.
+Key UI: Validation hints, RTL forms, loader on submit.
+________________________________________
+8) Payment (Stripe)
+Route: /orders/{order}/pay (or payments/stripe/pay)
+Access: Authenticated (authorized for the order)
+Purpose: Create a PaymentIntent and confirm payment via Stripe (test cards).
+Capture: Stripe card element, “Pay” button, short instructions (test card 4242…), feedback state.
+Key UI: Loader during confirmation, graceful error handling, redirect to order after success.
+________________________________________
+9) Thank You (Order Placed)
+Route: /checkout/thank-you (if used)
+Access: Authenticated
+Purpose: Post-purchase confirmation with next steps.
+Capture: Success state, short summary, link to “My Orders”.
+Key UI: RTL success banner, order number reference.
+________________________________________
+Customer Account
+10) My Orders (List)
+Route: /orders
+Access: Authenticated
+Purpose: Paginated list of the user’s orders.
+Capture: ID/number, created date, payment status pill, order status pill, total, “View” link.
+Key UI: RTL table, pagination, empty-state.
+________________________________________
+11) Order Details (Customer)
+Route: /orders/{order}
+Access: Authenticated & authorized
+Purpose: Full order breakdown and customer actions.
+Capture: Header (number, date), payment/status pills, line items with totals, actions row.
+Key UI: “Pay with Stripe” (if payable), “Cancel” (if cancelable), “View Invoice”, “Download PDF”.
+________________________________________
+12) Invoice (HTML)
+Route: /orders/{order}/invoice
+Access: Authenticated & authorized
+Purpose: Printable invoice view (RTL).
+Capture: Seller/buyer blocks, items table, totals, currency, order meta.
+Key UI: Clean RTL print-ready layout.
+________________________________________
+13) Invoice PDF (Download)
+Route: /orders/{order}/invoice/pdf
+Access: Authenticated & authorized
+Purpose: PDF version generated with mPDF (RTL fonts, Arabic).
+Capture: N/A (download), but you can show a preview screenshot of the PDF opened in a viewer.
+Key UI: Proper Arabic glyph shaping, right-to-left page direction.
+________________________________________
+Admin (Dashboard & Management)
+14) Admin Dashboard
+Route: /admin
+Access: Roles: Admin, Seller
+Purpose: Overview & navigation hub for management sections.
+Capture: Top bar, quick stats (if present), links to Books, Orders, Reviews, etc.
+Key UI: RTL admin header, role-aware nav.
+________________________________________
+15) Admin Books – Index
+Route: /admin/books
+Access: Roles: Admin, Seller (policy-filtered)
+Purpose: Manage books; search/filter and quick actions.
+Capture: List/grid of books, “Create Book” CTA.
+Key UI: Status (“draft/published”), stock, price, edit/delete buttons.
+________________________________________
+16) Admin Books – Create/Edit
+Route: /admin/books/create, /admin/books/{book}/edit
+Access: Roles: Admin, Seller
+Purpose: CRUD form for book metadata and pricing.
+Capture: Form sections (title/slug, ISBN, author text, category/publisher, price/currency, stock, cover upload, status).
+Key UI: Validation, RTL forms, submit with loader.
+________________________________________
+17) Admin Categories
+Route: /admin/categories (+ create/edit)
+Access: Admin
+Purpose: Manage categories used for browsing.
+Capture: Index table and create/edit form.
+Key UI: Name, slug, counts, CRUD actions.
+________________________________________
+18) Admin Publishers
+Route: /admin/publishers (+ create/edit)
+Access: Admin
+Purpose: Manage publishers and their slugs.
+Capture: Index table and create/edit form.
+Key UI: Name, slug, CRUD actions.
+________________________________________
+19) Admin Authors
+Route: /admin/authors (+ create/edit)
+Access: Admin
+Purpose: Manage authors linked to books.
+Capture: Index table and create/edit form.
+Key UI: Name, slug, CRUD actions.
+________________________________________
+20) Admin Users
+Route: /admin/users (+ edit)
+Access: Admin
+Purpose: Manage users and roles.
+Capture: Users table and role assignment UI.
+Key UI: Name, email, role badges (Admin/Seller/Customer), status.
+________________________________________
+21) Admin Reviews (Moderation)
+Route: /admin/reviews
+Access: Admin (and Seller sees reviews on own books)
+Purpose: Search/filter and approve/deny reviews.
+Capture: Filters (approved/pending, query), reviews list with book/user, toggle action.
+Key UI: Status toggle, delete, pagination.
+________________________________________
+22) Admin Orders – Index (With Filters)
+Route: /admin/orders
+Access: Roles: Admin, Seller (policy-filtered)
+Purpose: Search & filter orders at scale.
+Capture: Filters row (Status, Payment Status, Date From/To, Email), table of orders, pagination.
+Key UI: Payment/status pills, user email, created date, “View” link.
+Suggested shot: One image with filters expanded and results visible.
+________________________________________
+23) Admin Order – Details & Actions
+Route: /admin/orders/{order}
+Access: Roles: Admin, Seller (authorized)
+Purpose: Inspect order and perform actions.
+Capture: Header (payment/status, user), Payment Intent/Charge blocks, items & totals, actions section.
+Key UI:
+•	Update status (pending, processing, shipped, cancelled)
+•	Update payment status (unpaid, paid, refunded)
+•	Refund button (when paid)
+•	Mark Shipped (tracking number, carrier, shipped_at), shows tracking URL
+________________________________________
+Authentication & Errors
+24) Sign In / Register / Email Verification
+Routes: /login, /register, /email/verify
+Access: Public
+Purpose: Account access and verification (Jetstream/Fortify).
+Capture: RTL form fields, buttons, validation messages.
+Key UI: Clean RTL layout, password rules, verification prompt.
+________________________________________
+25) 403 – Forbidden
+Route: /errors/403 (view)
+Access: Public (error state)
+Purpose: Friendly error with RTL copy.
+Capture: The styled error card.
+Key UI: Back/Go Home link.
+________________________________________
+Transactional Emails (Mailpit Previews)
+Use Mailpit to preview; capture one desktop screenshot per template in Arabic RTL.
+26) Order Placed (RTL)
+Template: resources/views/emails/orders/placed.blade.php
+Purpose: Confirmation of order creation before payment.
+Capture: Subject line (RTL), order summary, “View Order” button.
+27) Order Paid (RTL + Invoice PDF)
+Template: resources/views/emails/orders/paid.blade.php
+Purpose: Payment confirmation; includes invoice PDF attachment.
+Capture: Greeting, order details, “View Order” button; show Mailpit header with subject in RTL.
+28) Order Shipped (RTL + Tracking)
+Template: resources/views/emails/orders/shipped.blade.php
+Purpose: Shipping notice with carrier, tracking number, link.
+Capture: Body with tracking info, action button.
+29) Order Cancelled
+Template: resources/views/emails/orders/cancelled.blade.php
+Purpose: Cancellation/refund notice.
+Capture: Reason copy (if provided), support link.
+30) Order Status Updated
+Template: resources/views/emails/orders/status_updated.blade.php
+Purpose: Inform user of status transitions (e.g., processing → shipped).
+Capture: Old/new statuses, CTA.
+________________________________________
+Shared UI Components
+31) Global Page Loader (Full-screen)
+View: resources/views/components/page-loader.blade.php
+Purpose: Show a blocking loader on submits/links; adds ripple effect.
+Capture: Overlay with spinner and “جارٍ التحميل…” text (RTL).
+Key UI: Semi-transparent backdrop, accessible aria tags.
+________________________________________
+32) Center Loader (Inline/Modal Style)
+View: resources/views/components/center-loader.blade.php (optional)
+Purpose: Use inside a card or modal (non-blocking).
+Capture: Single card with spinner + caption centered.
+Key UI: Works with data-loading="center" attributes.
+________________________________________
+33) RTL Pagination
+View: resources/views/vendor/pagination/tailwind-rtl.blade.php
+Purpose: Proper right-to-left pagination arrows and alignment.
+Capture: Pagination bar under a list/grid in RTL.
+Key UI: Active page state, hover states.
+________________________________________
+34) Flash Messages (Stack)
+Component: <x-flash-stack />
+Purpose: Consistent success/error banners with auto-dismiss.
+Capture: A success toast and a warning toast in RTL.
+Key UI: Rounded cards, readable Arabic labels.
+________________________________________
+Optional / Dev Tools
+35) Mailpit Inbox
+URL: http://localhost:8025/
+Purpose: Local email preview.
+Capture: A message list and a selected email in Arabic.
+Key UI: Shows subjects are correctly RTL.
+________________________________________
+36) Stripe Test Dashboard
+URL: https://dashboard.stripe.com/test/
+Purpose: Verify PaymentIntents/charges in test mode.
+Capture: PaymentIntent/Charge record that corresponds to an order.
+Key UI: Useful to demonstrate end-to-end payment flow.
 
-> Put your images under `docs/screenshots/` and commit them.  
-> The paths below are relative to the repo root and safe for GitHub preview.
-
-### Customer Experience
-
-| Home | Book Details |
-| --- | --- |
-| ![Home](docs/screenshots/home.png) | ![Book Details](docs/screenshots/book-details.png) |
-
-| Cart | Checkout |
-| --- | --- |
-| ![Cart](docs/screenshots/cart.png) | ![Checkout](docs/screenshots/checkout.png) |
-
-| Order Details | Payment (Stripe) |
-| --- | --- |
-| ![Order Details](docs/screenshots/order-details.png) | ![Stripe](docs/screenshots/stripe-payment.png) |
-
-### Admin Panel
-
-| Dashboard | Orders List |
-| --- | --- |
-| ![Admin Dashboard](docs/screenshots/admin-dashboard.png) | ![Admin Orders](docs/screenshots/admin-orders.png) |
-
-| Order Show | Mailpit (Emails) |
-| --- | --- |
-| ![Admin Order Show](docs/screenshots/admin-order-show.png) | ![Mailpit](docs/screenshots/mailpit.png) |
-
-> **Tip:** If you use Arabic/RTL screenshots, keep your app `<html dir="rtl">` for consistent rendering.
 
 ---
 
