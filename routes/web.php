@@ -3,6 +3,9 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\AccountController;
+
+
 
 // Front Controllers
 use App\Http\Controllers\{
@@ -75,6 +78,17 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/orders/{order}', [OrderController::class, 'show'])->name('orders.show');
     Route::get('/orders/{order}/status', [OrderController::class, 'status'])->name('orders.status');
 
+    // لوحة حسابي (العميل)
+    // Route::get('/account', [AccountController::class, 'dashboard'])
+    //     ->name('account.dashboard');
+
+    // ✅ صفحة لوحة حساب العميل
+    Route::get('/account', [AccountController::class, 'dashboard'])->name('account.index');
+
+    // (اختياري) إن كانت موجودة عندك بالفعل اتركها، وإلا أضفها:
+    Route::get('/account/orders', [AccountController::class, 'orders'])->name('account.orders.index');
+    Route::get('/account/orders/{order}', [AccountController::class, 'show'])->name('account.orders.show');
+
     // فواتير
     Route::get('/orders/{order}/invoice', [OrderController::class, 'invoice'])->name('orders.invoice');
     Route::get('/orders/{order}/invoice.pdf', [OrderController::class, 'invoicePdf'])->name('orders.invoice.pdf');
@@ -99,22 +113,68 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 |--------------------------------------------------------------------------
 | مسارات التحقق من البريد (Jetstream / Fortify)
 |--------------------------------------------------------------------------
+
+*/
+// Route::middleware('auth')->group(function () {
+//     Route::get('/email/verify', fn() => view('auth.verify-email'))->name('verification.notice');
+
+//     Route::get(
+//         '/email/verify/{id}/{hash}',
+//         function (EmailVerificationRequest $request) {
+//             $request->fulfill();
+//             return redirect()->route('dashboard');
+//         }
+//     )->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+
+//     Route::post('/email/verification-notification', function (Request $request) {
+//         $request->user()->sendEmailVerificationNotification();
+//         return back()->with('status', 'verification-link-sent');
+//     })->middleware(['throttle:6,1'])->name('verification.send');
+// });
+
+/*
+
+/*
+|--------------------------------------------------------------------------
+| مسارات التحقق من البريد (Jetstream / Fortify)
+|--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-    Route::get('/email/verify', fn() => view('auth.verify-email'))->name('verification.notice');
+    // صفحة التعليمات لإتمام التحقق
+    Route::get('/email/verify', fn() => view('auth.verify-email'))
+        ->name('verification.notice');
 
-    Route::get(
-        '/email/verify/{id}/{hash}',
-        function (EmailVerificationRequest $request) {
-            $request->fulfill();
-            return redirect()->route('dashboard');
-        }
-    )->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
+    // رابط التحقق الموقّع
+    Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+        // يحدّث verified_at
+        $request->fulfill();
 
+        $user = $request->user();
+
+        // الوجهة بحسب الدور
+        $candidate = ($user && ($user->hasRole('Admin') || $user->hasRole('Seller')))
+            ? 'admin.dashboard'
+            : 'account.dashboard';
+
+        // اختر أول Route Name موجود فعليًا احتياطيًا
+        $target = collect([$candidate, 'dashboard', 'home'])
+            ->first(fn($name) => Route::has($name));
+
+        // إن وجد intended URL سيُحترم تلقائيًا
+        return redirect()->route($target);
+    })->middleware(['signed', 'throttle:6,1'])
+        ->name('verification.verify');
+
+    // إعادة إرسال رسالة التحقق
     Route::post('/email/verification-notification', function (Request $request) {
+        if ($request->user()->hasVerifiedEmail()) {
+            return back()->with('info', 'تمّ التحقق من بريدك مسبقًا.');
+        }
+
         $request->user()->sendEmailVerificationNotification();
         return back()->with('status', 'verification-link-sent');
-    })->middleware(['throttle:6,1'])->name('verification.send');
+    })->middleware(['throttle:6,1'])
+        ->name('verification.send');
 });
 
 /*
