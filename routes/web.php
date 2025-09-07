@@ -5,7 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\WishlistController;
- use App\Http\Controllers\CompareController;
+use App\Http\Controllers\CompareController;
 
 // Front Controllers
 use App\Http\Controllers\{
@@ -36,6 +36,7 @@ use App\Http\Controllers\Admin\{
     AuthorController as AdminAuthorController,
     UserController as AdminUserController,
     OrderController as AdminOrderController,
+    AnalyticsController as AdminAnalyticsController,
     ProfileController as AdminProfileController
 };
 
@@ -51,7 +52,7 @@ Route::get('/books', [BookController::class, 'index'])->name('books.index');    
 Route::get('/books/search', [BookController::class, 'search'])->name('books.search'); // إرجاع جزء النتائج (AJAX)
 Route::get('/books/{book:slug}', [BookController::class, 'show'])
     ->where('book', '^(?!search$)[^/]+$') // استثناء كلمة search من الالتقاط
-    ->name('books.show');  
+    ->name('books.show');
 
 // ... بعد مسارات الكتب
 Route::get('/compare', [CompareController::class, 'index'])->name('compare.index');
@@ -170,8 +171,17 @@ Route::prefix('admin')
     ->name('admin.')
     ->middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified', 'role:Admin|Seller'])
     ->group(function () {
+
+
         // Dashboard (Controller invokable)
         Route::get('/', DashboardController::class)->name('dashboard');
+
+        Route::get('/analytics', action: [AdminAnalyticsController::class, 'index'])->name('analytics.index');
+
+        Route::get('/analytics/export', [AdminAnalyticsController::class, 'export'])
+            ->name('analytics.export');
+
+
 
         // Admin Profile
         Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile');

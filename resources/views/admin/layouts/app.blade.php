@@ -73,6 +73,9 @@
                 href="{{ route('admin.reviews.index') }}">المراجعات</a>
               <a class="{{ $base }} {{ $is('admin.orders.*') ? $active : '' }}"
                 href="{{ route('admin.orders.index') }}">الطلبات</a>
+              <a class="{{ $base }} {{ $is('admin.analytics.*') ? $active : '' }}"
+                href="{{ route('admin.analytics.index') }}">التحليلات</a>
+
             @endif
 
 
