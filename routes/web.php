@@ -4,8 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\AccountController;
-
-
+use App\Http\Controllers\WishlistController;
 
 // Front Controllers
 use App\Http\Controllers\{
@@ -46,16 +45,16 @@ use App\Http\Controllers\Admin\{
 */
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/books/{book:slug}', [BookController::class, 'show'])->name('books.show');
-Route::get('/books', [BookController::class, 'index'])->name('books.index');      // صفحة البحث/التصفية
-Route::get('/books/search', [BookController::class, 'search'])->name('books.search'); // إرجاع جزء النتائج 
+/** ترتيب مهم: index ثم search ثم show */
+Route::get('/books', [BookController::class, 'index'])->name('books.index');          // صفحة البحث/التصفية
+Route::get('/books/search', [BookController::class, 'search'])->name('books.search'); // إرجاع جزء النتائج (AJAX)
+Route::get('/books/{book:slug}', [BookController::class, 'show'])
+    ->where('book', '^(?!search$)[^/]+$') // استثناء كلمة search من الالتقاط
+    ->name('books.show');
 
 Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/publishers/{publisher:slug}', [PublisherController::class, 'show'])->name('publishers.show');
 Route::get('/authors/{author:slug}', [AuthorController::class, 'show'])->name('authors.show');
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -85,10 +84,6 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     Route::get('/orders/{order}/status', [OrderController::class, 'status'])->name('orders.status');
 
     // لوحة حسابي (العميل)
-    // Route::get('/account', [AccountController::class, 'dashboard'])
-    //     ->name('account.dashboard');
-
-    // ✅ صفحة لوحة حساب العميل
     Route::get('/account', [AccountController::class, 'dashboard'])->name('account.index');
 
     // (اختياري) إن كانت موجودة عندك بالفعل اتركها، وإلا أضفها:
@@ -102,6 +97,12 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
     // نقاط دفع/إلغاء تجريبية
     Route::get('/payments/mock/{order}/success', [PaymentController::class, 'mockSuccess'])->name('payments.mock.success');
     Route::post('/orders/{order}/cancel', [PaymentController::class, 'cancel'])->name('orders.cancel');
+
+    // Wishlist (المفضّلة)
+    Route::get('/wishlist', [WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/{book}', [WishlistController::class, 'store'])->name('wishlist.store');
+    Route::delete('/wishlist/{book}', [WishlistController::class, 'destroy'])->name('wishlist.destroy');
+    Route::post('/wishlist/{book}/toggle', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 });
 
 /*
@@ -119,57 +120,25 @@ Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified']
 |--------------------------------------------------------------------------
 | مسارات التحقق من البريد (Jetstream / Fortify)
 |--------------------------------------------------------------------------
-
-*/
-// Route::middleware('auth')->group(function () {
-//     Route::get('/email/verify', fn() => view('auth.verify-email'))->name('verification.notice');
-
-//     Route::get(
-//         '/email/verify/{id}/{hash}',
-//         function (EmailVerificationRequest $request) {
-//             $request->fulfill();
-//             return redirect()->route('dashboard');
-//         }
-//     )->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
-
-//     Route::post('/email/verification-notification', function (Request $request) {
-//         $request->user()->sendEmailVerificationNotification();
-//         return back()->with('status', 'verification-link-sent');
-//     })->middleware(['throttle:6,1'])->name('verification.send');
-// });
-
-/*
-
-/*
-|--------------------------------------------------------------------------
-| مسارات التحقق من البريد (Jetstream / Fortify)
-|--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
     // صفحة التعليمات لإتمام التحقق
-    Route::get('/email/verify', fn() => view('auth.verify-email'))
-        ->name('verification.notice');
+    Route::get('/email/verify', fn() => view('auth.verify-email'))->name('verification.notice');
 
     // رابط التحقق الموقّع
     Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-        // يحدّث verified_at
         $request->fulfill();
 
         $user = $request->user();
-
-        // الوجهة بحسب الدور
         $candidate = ($user && ($user->hasRole('Admin') || $user->hasRole('Seller')))
             ? 'admin.dashboard'
-            : 'account.dashboard';
+            : 'account.index'; // ✅ تصحيح الاسم
 
-        // اختر أول Route Name موجود فعليًا احتياطيًا
         $target = collect([$candidate, 'dashboard', 'home'])
             ->first(fn($name) => Route::has($name));
 
-        // إن وجد intended URL سيُحترم تلقائيًا
         return redirect()->route($target);
-    })->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
+    })->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
 
     // إعادة إرسال رسالة التحقق
     Route::post('/email/verification-notification', function (Request $request) {
@@ -179,8 +148,7 @@ Route::middleware('auth')->group(function () {
 
         $request->user()->sendEmailVerificationNotification();
         return back()->with('status', 'verification-link-sent');
-    })->middleware(['throttle:6,1'])
-        ->name('verification.send');
+    })->middleware(['throttle:6,1'])->name('verification.send');
 });
 
 /*
@@ -197,7 +165,7 @@ Route::prefix('admin')
         // Dashboard (Controller invokable)
         Route::get('/', DashboardController::class)->name('dashboard');
 
-        // NEW: Admin Profile
+        // Admin Profile
         Route::get('/profile', [AdminProfileController::class, 'show'])->name('profile');
 
         // كتب (Seller يدير كتبه عبر Policy، Admin الكل)

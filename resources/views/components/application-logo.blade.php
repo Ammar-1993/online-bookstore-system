@@ -1,6 +1,6 @@
-<a href="/" aria-label="Online Bookstore System">
+<a href="/" aria-label=" المتجر الإلكتروني للكتب">
   <svg class="size-16" viewBox="0 0 48 48" role="img" xmlns="http://www.w3.org/2000/svg">
-    <title>Online Bookstore System</title>
+    <title> المتجر الإلكتروني للكتب</title>
     <defs>
       <!-- تدرّج الخلفية -->
       <linearGradient id="obs-g1" x1="0" y1="0" x2="1" y2="1">

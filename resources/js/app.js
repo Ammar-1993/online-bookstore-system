@@ -1,6 +1,10 @@
 import './bootstrap';
-import setupPageLoader from './plugins/pageLoader';
+import { setupPageLoader } from './plugins/pageLoader';
 import setupLiveSearch from './plugins/liveSearch';
+import setupWishlistToggle from './plugins/wishlist';
 
-setupPageLoader();
-setupLiveSearch();
+document.addEventListener('DOMContentLoaded', () => {
+  setupPageLoader?.();
+  setupLiveSearch?.();
+  setupWishlistToggle?.();
+});
