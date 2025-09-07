@@ -5,6 +5,7 @@ use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\WishlistController;
+ use App\Http\Controllers\CompareController;
 
 // Front Controllers
 use App\Http\Controllers\{
@@ -50,7 +51,14 @@ Route::get('/books', [BookController::class, 'index'])->name('books.index');    
 Route::get('/books/search', [BookController::class, 'search'])->name('books.search'); // إرجاع جزء النتائج (AJAX)
 Route::get('/books/{book:slug}', [BookController::class, 'show'])
     ->where('book', '^(?!search$)[^/]+$') // استثناء كلمة search من الالتقاط
-    ->name('books.show');
+    ->name('books.show');  
+
+// ... بعد مسارات الكتب
+Route::get('/compare', [CompareController::class, 'index'])->name('compare.index');
+// toggle متاح للجميع (ضيف = Session، مسجّل = DB)
+Route::post('/compare/{book}/toggle', [CompareController::class, 'toggle'])->name('compare.toggle');
+Route::delete('/compare/{book}', [CompareController::class, 'destroy'])->name('compare.destroy');
+
 
 Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/publishers/{publisher:slug}', [PublisherController::class, 'show'])->name('publishers.show');

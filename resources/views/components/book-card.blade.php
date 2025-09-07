@@ -1,5 +1,9 @@
 {{-- resources/views/components/book-card.blade.php --}}
-@props(['book', 'wishlistIds' => []])
+@props([
+  'book',
+  'wishlistIds' => [],
+  'compareIds'  => [],
+])
 
 @php
   $inStock   = (int) ($book->stock_qty ?? 0) > 0;
@@ -20,9 +24,14 @@
 
   $titleId = 'book-title-' . $book->getKey();
 
-  // تحديد حالة المفضلة: عبر قائمة IDs الممرّرة، أو عبر pivot عندما تأتي الكتب من علاقة wishlist
+  // حالة المفضّلة: عبر IDs الممرّرة أو عبر pivot من علاقة wishlist
   $pivotHasWishlist = isset($book->pivot) && method_exists($book->pivot, 'getTable') && $book->pivot->getTable() === 'wishlists';
   $isFav = auth()->check() && (in_array($book->id, $wishlistIds, true) || $pivotHasWishlist);
+
+  // حالة المقارنة: IDs ممرّرة أو pivot من علاقة compares أو من Session للضيف
+  $pivotHasCompare = isset($book->pivot) && method_exists($book->pivot, 'getTable') && $book->pivot->getTable() === 'compares';
+  $sessionCompare  = (array) session('compare.items', []);
+  $isCompared = in_array($book->id, $compareIds, true) || $pivotHasCompare || in_array($book->id, $sessionCompare, true);
 @endphp
 
 <div class="group bg-white dark:bg-gray-900 rounded-2xl shadow ring-1 ring-black/5 dark:ring-white/10 overflow-hidden transition hover:-translate-y-0.5 hover:shadow-lg">
@@ -32,8 +41,7 @@
       <button
         type="button"
         class="absolute top-2 left-2 rtl:left-auto rtl:right-2 z-10 wishlist-toggle rounded-full bg-white/90 dark:bg-black/50 backdrop-blur px-2.5 py-1.5 shadow
-               text-sm leading-none border border-slate-200 dark:border-slate-600
-               hover:bg-white dark:hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+               text-sm leading-none border border-slate-200 dark:border-slate-600 hover:bg-white dark:hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
         data-url="{{ route('wishlist.toggle', $book) }}"
         aria-pressed="{{ $isFav ? 'true' : 'false' }}"
         title="{{ $isFav ? 'إزالة من المفضّلة' : 'إضافة إلى المفضّلة' }}">
@@ -45,6 +53,23 @@
         </span>
       </button>
     @endauth
+
+    {{-- زر المقارنة (متاح للجميع؛ الضيف يُخزّن بالجلسة) --}}
+    <button
+      type="button"
+      class="absolute top-10 left-2 rtl:left-auto rtl:right-2 z-10 compare-toggle rounded-full bg-white/90 dark:bg-black/50 backdrop-blur px-2.5 py-1.5 shadow
+             text-sm leading-none border border-slate-200 dark:border-slate-600 hover:bg-white dark:hover:bg-black focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+      data-url="{{ route('compare.toggle', $book) }}"
+      aria-pressed="{{ $isCompared ? 'true' : 'false' }}"
+      title="{{ $isCompared ? 'إزالة من المقارنة' : 'إضافة إلى المقارنة' }}">
+      <span class="inline-flex items-center gap-1">
+        {{-- أيقونة الموازين --}}
+        <svg viewBox="0 0 24 24" class="w-4 h-4 {{ $isCompared ? 'fill-indigo-600' : 'fill-transparent' }} stroke-indigo-600" stroke-width="1.8" aria-hidden="true">
+          <path d="M12 3v18M3 7h18M7 7l3 5H4l3-5Zm10 0l3 5h-6l3-5Z"/>
+        </svg>
+        <span class="sr-only">{{ $isCompared ? 'إزالة من المقارنة' : 'إضافة إلى المقارنة' }}</span>
+      </span>
+    </button>
 
     <a href="{{ route('books.show', $book) }}"
        class="block relative focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 rounded-2xl"
@@ -115,7 +140,9 @@
     <form method="POST" action="{{ route('cart.add', $book) }}" class="mt-3">
       @csrf
       <input type="hidden" name="qty" value="1">
-      <button type="submit" aria-label="أضف {{ $book->title }} إلى السلة"
+      <button
+        type="submit"
+        aria-label="أضف {{ $book->title }} إلى السلة"
         class="w-full px-3 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition"
         @if(!$inStock) disabled aria-disabled="true" title="غير متاح حالياً" @endif
         data-ripple data-loader>

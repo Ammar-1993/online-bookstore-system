@@ -172,4 +172,12 @@ class Book extends Model
     {
         return $this->belongsToMany(User::class, 'wishlists')->withTimestamps();
     }
+
+
+
+    public function comparedBy(): BelongsToMany
+    {
+        return $this->belongsToMany(User::class, 'compares')->withTimestamps();
+    }
+
 }

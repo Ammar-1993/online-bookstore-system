@@ -16,6 +16,7 @@ use Spatie\Permission\Traits\HasRoles;
 use App\Models\Order;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
+
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasApiTokens;
@@ -94,5 +95,10 @@ class User extends Authenticatable implements MustVerifyEmail
     public function wishlistBooks(): BelongsToMany
     {
         return $this->belongsToMany(Book::class, 'wishlists')->withTimestamps();
+    }
+
+    public function compareBooks(): BelongsToMany
+    {
+        return $this->belongsToMany(Book::class, 'compares')->withTimestamps();
     }
 }
