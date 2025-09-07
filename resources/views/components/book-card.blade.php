@@ -1,4 +1,3 @@
-
 {{-- resources/views/components/book-card.blade.php --}}
 @props(['book'])
 
@@ -14,17 +13,30 @@
     $authors = trim(
         (string) ($book->authors->pluck('name')->filter()->take(2)->join('، ') ?: ($book->author_main ?? ''))
     );
+
+    $coverUrl = $book->cover_image_path
+        ? asset('storage/'.$book->cover_image_path)
+        : 'https://placehold.co/600x800?text=No+Cover';
+
+    $titleId = 'book-title-'.$book->getKey();
 @endphp
 
 <div class="group bg-white dark:bg-gray-900 rounded-2xl shadow ring-1 ring-black/5 dark:ring-white/10 overflow-hidden transition
             hover:-translate-y-0.5 hover:shadow-lg">
-  <a href="{{ route('books.show', $book) }}" class="block relative">
-    <div class="relative h-64 md:h-72 overflow-hidden">
+  <a href="{{ route('books.show', $book) }}"
+     class="block relative focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 rounded-2xl"
+     aria-labelledby="{{ $titleId }}"
+     aria-label="عرض تفاصيل: {{ $book->title }}">
+    <div class="relative overflow-hidden"
+         style="aspect-ratio: 3 / 4;">
       <img
-        src="{{ $book->cover_image_path ? asset('storage/'.$book->cover_image_path) : 'https://placehold.co/600x800?text=No+Cover' }}"
+        src="{{ $coverUrl }}"
         alt="غلاف: {{ $book->title }}"
-        loading="lazy" decoding="async"
-        class="w-full h-full object-cover transition duration-300 group-hover:scale-[1.02]">
+        loading="lazy"
+        decoding="async"
+        fetchpriority="low"
+        width="480" height="640"
+        class="w-full h-full object-cover select-none transition duration-300 group-hover:scale-[1.02]">
 
       {{-- شارة الخصم/النفاد --}}
       @if($hasSale)
@@ -43,22 +55,26 @@
     </div>
 
     <div class="p-3">
-      <div class="font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">{{ $book->title }}</div>
+      <div id="{{ $titleId }}" class="font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">
+        {{ $book->title }}
+      </div>
       @if($authors)
-        <div class="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-1">{{ $authors }}</div>
-      @endif>
+        <div class="mt-1 text-sm text-gray-600 dark:text-gray-300 line-clamp-1">
+          {{ $authors }}
+        </div>
+      @endif
     </div>
   </a>
 
   <div class="px-3 pb-3">
     <div class="mt-1 flex items-center justify-between">
-      <div class="tabular-nums">
+      <div class="tabular-nums" aria-label="السعر">
         @if($hasSale)
           <div class="flex items-baseline gap-2">
             <span class="font-bold text-emerald-700 dark:text-emerald-300">
               {{ number_format($salePrice, 2) }} {{ $currency }}
             </span>
-            <span class="text-xs line-through text-gray-400 dark:text-gray-500">
+            <span class="text-xs line-through text-gray-400 dark:text-gray-500" aria-label="السعر قبل الخصم">
               {{ number_format($price, 2) }} {{ $currency }}
             </span>
           </div>
@@ -70,7 +86,7 @@
       </div>
 
       @if($inStock)
-        <span class="hidden sm:inline-flex items-center gap-1 text-[11px] text-emerald-700 dark:text-emerald-300">
+        <span class="hidden sm:inline-flex items-center gap-1 text-[11px] text-emerald-700 dark:text-emerald-300" aria-live="polite">
           <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span> متاح
         </span>
       @endif
@@ -80,7 +96,7 @@
       @csrf
       <input type="hidden" name="qty" value="1">
       <button type="submit" aria-label="أضف {{ $book->title }} إلى السلة"
-              class="w-full px-3 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed"
+              class="w-full px-3 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 disabled:opacity-60 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-gray-900 transition"
               @if(! $inStock) disabled aria-disabled="true" title="غير متاح حالياً" @endif
               data-ripple data-loader>
         أضف للسلة

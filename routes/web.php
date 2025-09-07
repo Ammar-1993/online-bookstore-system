@@ -36,7 +36,7 @@ use App\Http\Controllers\Admin\{
     AuthorController as AdminAuthorController,
     UserController as AdminUserController,
     OrderController as AdminOrderController,
-    profileController as AdminProfileController
+    ProfileController as AdminProfileController
 };
 
 /*
@@ -47,9 +47,15 @@ use App\Http\Controllers\Admin\{
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
 Route::get('/books/{book:slug}', [BookController::class, 'show'])->name('books.show');
+Route::get('/books', [BookController::class, 'index'])->name('books.index');      // صفحة البحث/التصفية
+Route::get('/books/search', [BookController::class, 'search'])->name('books.search'); // إرجاع جزء النتائج 
+
 Route::get('/categories/{category:slug}', [CategoryController::class, 'show'])->name('categories.show');
 Route::get('/publishers/{publisher:slug}', [PublisherController::class, 'show'])->name('publishers.show');
 Route::get('/authors/{author:slug}', [AuthorController::class, 'show'])->name('authors.show');
+
+
+
 
 /*
 |--------------------------------------------------------------------------

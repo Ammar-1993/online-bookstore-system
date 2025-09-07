@@ -4,6 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Book;
 use Illuminate\View\View;
+use App\Http\Requests\BookFilterRequest;
+use App\Models\Category;
+use App\Models\Publisher;
+use App\Models\Author;
+
 
 class BookController extends Controller
 {
@@ -78,5 +83,42 @@ class BookController extends Controller
             'starsPercent'  => $starsPercent,
             'related'       => $related,
         ]);
+    }
+
+    // ...
+
+    public function index(BookFilterRequest $request)
+    {
+        $filters = $request->validated();
+
+        $query = Book::query()
+            ->with(['authors:id,name,slug', 'publisher:id,name,slug', 'category:id,name,slug'])
+            ->filter($filters)
+            ->sorted($filters['sort'] ?? null);
+
+        $books = $query->paginate($filters['per_page'])->withQueryString();
+
+        // خيارات القوائم (يُمكن كاشها لاحقًا)
+        $categories = Category::query()->select('id','name','slug')->orderBy('name')->get();
+        $publishers = Publisher::query()->select('id','name','slug')->orderBy('name')->get();
+        $authors    = Author::query()->select('id','name','slug')->orderBy('name')->take(200)->get();
+
+        return view('books.index', compact('books', 'categories', 'publishers', 'authors', 'filters'));
+    }
+
+    // جزء النتائج (AJAX)
+    public function search(BookFilterRequest $request)
+    {
+        $filters = $request->validated();
+
+        $books = Book::query()
+            ->with(['authors:id,name,slug', 'publisher:id,name,slug', 'category:id,name,slug'])
+            ->filter($filters)
+            ->sorted($filters['sort'] ?? null)
+            ->paginate($filters['per_page'])
+            ->withQueryString();
+
+        // نرجّع جزء HTML (Blade) لسهولة الاستبدال
+        return view('books.partials.grid', compact('books'));
     }
 }

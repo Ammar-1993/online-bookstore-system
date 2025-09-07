@@ -1,5 +1,6 @@
 import './bootstrap';
-// ملفاتك الحالية…
-import './plugins/pageLoader';
+import setupPageLoader from './plugins/pageLoader';
+import setupLiveSearch from './plugins/liveSearch';
 
-
+setupPageLoader();
+setupLiveSearch();
