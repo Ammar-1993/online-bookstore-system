@@ -36,15 +36,20 @@ A modern, RTL-ready (Arabic) online bookstore built with **Laravel 12**, featuri
 
 ---
 
-Screenshots
-Tip: keep all images under docs/screenshots/ and use consistent naming like 01-home.png, 02-category.png, … to match the order below.
-Storefront (Public)
-1) Home (Landing & Featured)
-Route: /
-Access: Public
-Purpose: First contact with the bookstore; highlight featured/new books and entry paths.
-Capture: Top navigation, hero (if any), featured books grid, footer.
-Key UI: Search, categories link, book cards (cover, title, price, currency), RTL layout.
+## Screenshots
+
+> *🔐 Home Interface:
+The login interface provides users with secure access to the system through a clean and intuitive Arabic user interface. It includes fields for entering an email address and password, a password visibility toggle, and a “Forgot Password?” option for easy recovery. The interface supports multilingual access (Arabic and English) and aligns with modern UI principles to ensure usability across devices.*
+> <img width="1920" height="1312" alt="image" src="docs/screenshots/home.png" />
+
+
+- [Home] (Landing & Featured)
+- [Route]: /
+- [Access]: Public
+- [Purpose]: First contact with the bookstore; highlight featured/new books and entry paths.
+- [Capture]: Top navigation, hero (if any), featured books grid, footer.
+- [KeyUI]: Search, categories link, book cards (cover, title, price, currency), RTL layout.
+- [Link]: 
 ________________________________________
 2) Category Details
 Route: /categories/{slug}
