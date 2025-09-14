@@ -36,258 +36,294 @@ A modern, RTL-ready (Arabic) online bookstore built with **Laravel 12**, featuri
 
 ---
 
-## Screenshots
-
-> *🔐 Home Interface:
-The login interface provides users with secure access to the system through a clean and intuitive Arabic user interface. It includes fields for entering an email address and password, a password visibility toggle, and a “Forgot Password?” option for easy recovery. The interface supports multilingual access (Arabic and English) and aligns with modern UI principles to ensure usability across devices.*
-> <img width="1920" height="1312" alt="image" src="docs/screenshots/home.png" />
+## لقطات الشاشة | Screenshots
 
 
-- [Home] (Landing & Featured)
-- [Route]: /
-- [Access]: Public
-- [Purpose]: First contact with the bookstore; highlight featured/new books and entry paths.
-- [Capture]: Top navigation, hero (if any), featured books grid, footer.
-- [KeyUI]: Search, categories link, book cards (cover, title, price, currency), RTL layout.
-- [Link]: 
-________________________________________
-2) Category Details
-Route: /categories/{slug}
-Access: Public
-Purpose: Browse books by category.
-Capture: Category title/description, filter/sort (if present), paginated grid.
-Key UI: Book cards, RTL pagination, breadcrumbs back to Home.
-________________________________________
-3) Publisher Details
-Route: /publishers/{slug}
-Access: Public
-Purpose: Showcase books from a specific publisher.
-Capture: Publisher header (name/logo if available), books list, pagination.
-Key UI: Book cards with price/currency, consistent RTL spacing.
-________________________________________
-4) Author Details
-Route: /authors/{slug}
-Access: Public
-Purpose: Show an author profile and books by that author.
-Capture: Author name/bio (if present), books grid.
-Key UI: Book cards, RTL typography and avatars (if used).
-________________________________________
-5) Book Details (+ Reviews)
-Route: /books/{slug}
-Access: Public
-Purpose: Product page for a book; add to cart; view/add reviews.
-Capture: Cover, title, author/publisher, price/currency, stock, add-to-cart button, reviews block.
-Key UI: Star rating display, review list (approved only), “write/update review” (for verified users), related books strip.
-________________________________________
-6) Cart
-Route: /cart
-Access: Public
-Purpose: Review items, edit quantities, remove/clear, proceed to checkout.
-Capture: Table of items (cover, title, unit price, qty, line total), totals box, “Proceed to Checkout”.
-Key UI: Quantity update form, delete buttons, empty-state card, RTL table.
-________________________________________
-7) Checkout
-Route: /checkout
-Access: Authenticated
-Purpose: Capture shipping/billing details and confirm order before payment.
-Capture: Shipping form, summary of items, totals, “Pay with Stripe (test)” CTA.
-Key UI: Validation hints, RTL forms, loader on submit.
-________________________________________
-8) Payment (Stripe)
-Route: /orders/{order}/pay (or payments/stripe/pay)
-Access: Authenticated (authorized for the order)
-Purpose: Create a PaymentIntent and confirm payment via Stripe (test cards).
-Capture: Stripe card element, “Pay” button, short instructions (test card 4242…), feedback state.
-Key UI: Loader during confirmation, graceful error handling, redirect to order after success.
-________________________________________
-9) Thank You (Order Placed)
-Route: /checkout/thank-you (if used)
-Access: Authenticated
-Purpose: Post-purchase confirmation with next steps.
-Capture: Success state, short summary, link to “My Orders”.
-Key UI: RTL success banner, order number reference.
-________________________________________
-Customer Account
-10) My Orders (List)
-Route: /orders
-Access: Authenticated
-Purpose: Paginated list of the user’s orders.
-Capture: ID/number, created date, payment status pill, order status pill, total, “View” link.
-Key UI: RTL table, pagination, empty-state.
-________________________________________
-11) Order Details (Customer)
-Route: /orders/{order}
-Access: Authenticated & authorized
-Purpose: Full order breakdown and customer actions.
-Capture: Header (number, date), payment/status pills, line items with totals, actions row.
-Key UI: “Pay with Stripe” (if payable), “Cancel” (if cancelable), “View Invoice”, “Download PDF”.
-________________________________________
-12) Invoice (HTML)
-Route: /orders/{order}/invoice
-Access: Authenticated & authorized
-Purpose: Printable invoice view (RTL).
-Capture: Seller/buyer blocks, items table, totals, currency, order meta.
-Key UI: Clean RTL print-ready layout.
-________________________________________
-13) Invoice PDF (Download)
-Route: /orders/{order}/invoice/pdf
-Access: Authenticated & authorized
-Purpose: PDF version generated with mPDF (RTL fonts, Arabic).
-Capture: N/A (download), but you can show a preview screenshot of the PDF opened in a viewer.
-Key UI: Proper Arabic glyph shaping, right-to-left page direction.
-________________________________________
-Admin (Dashboard & Management)
-14) Admin Dashboard
-Route: /admin
-Access: Roles: Admin, Seller
-Purpose: Overview & navigation hub for management sections.
-Capture: Top bar, quick stats (if present), links to Books, Orders, Reviews, etc.
-Key UI: RTL admin header, role-aware nav.
-________________________________________
-15) Admin Books – Index
-Route: /admin/books
-Access: Roles: Admin, Seller (policy-filtered)
-Purpose: Manage books; search/filter and quick actions.
-Capture: List/grid of books, “Create Book” CTA.
-Key UI: Status (“draft/published”), stock, price, edit/delete buttons.
-________________________________________
-16) Admin Books – Create/Edit
-Route: /admin/books/create, /admin/books/{book}/edit
-Access: Roles: Admin, Seller
-Purpose: CRUD form for book metadata and pricing.
-Capture: Form sections (title/slug, ISBN, author text, category/publisher, price/currency, stock, cover upload, status).
-Key UI: Validation, RTL forms, submit with loader.
-________________________________________
-17) Admin Categories
-Route: /admin/categories (+ create/edit)
-Access: Admin
-Purpose: Manage categories used for browsing.
-Capture: Index table and create/edit form.
-Key UI: Name, slug, counts, CRUD actions.
-________________________________________
-18) Admin Publishers
-Route: /admin/publishers (+ create/edit)
-Access: Admin
-Purpose: Manage publishers and their slugs.
-Capture: Index table and create/edit form.
-Key UI: Name, slug, CRUD actions.
-________________________________________
-19) Admin Authors
-Route: /admin/authors (+ create/edit)
-Access: Admin
-Purpose: Manage authors linked to books.
-Capture: Index table and create/edit form.
-Key UI: Name, slug, CRUD actions.
-________________________________________
-20) Admin Users
-Route: /admin/users (+ edit)
-Access: Admin
-Purpose: Manage users and roles.
-Capture: Users table and role assignment UI.
-Key UI: Name, email, role badges (Admin/Seller/Customer), status.
-________________________________________
-21) Admin Reviews (Moderation)
-Route: /admin/reviews
-Access: Admin (and Seller sees reviews on own books)
-Purpose: Search/filter and approve/deny reviews.
-Capture: Filters (approved/pending, query), reviews list with book/user, toggle action.
-Key UI: Status toggle, delete, pagination.
-________________________________________
-22) Admin Orders – Index (With Filters)
-Route: /admin/orders
-Access: Roles: Admin, Seller (policy-filtered)
-Purpose: Search & filter orders at scale.
-Capture: Filters row (Status, Payment Status, Date From/To, Email), table of orders, pagination.
-Key UI: Payment/status pills, user email, created date, “View” link.
-Suggested shot: One image with filters expanded and results visible.
-________________________________________
-23) Admin Order – Details & Actions
-Route: /admin/orders/{order}
-Access: Roles: Admin, Seller (authorized)
-Purpose: Inspect order and perform actions.
-Capture: Header (payment/status, user), Payment Intent/Charge blocks, items & totals, actions section.
-Key UI:
-•	Update status (pending, processing, shipped, cancelled)
-•	Update payment status (unpaid, paid, refunded)
-•	Refund button (when paid)
-•	Mark Shipped (tracking number, carrier, shipped_at), shows tracking URL
-________________________________________
-Authentication & Errors
-24) Sign In / Register / Email Verification
-Routes: /login, /register, /email/verify
-Access: Public
-Purpose: Account access and verification (Jetstream/Fortify).
-Capture: RTL form fields, buttons, validation messages.
-Key UI: Clean RTL layout, password rules, verification prompt.
-________________________________________
-25) 403 – Forbidden
-Route: /errors/403 (view)
-Access: Public (error state)
-Purpose: Friendly error with RTL copy.
-Capture: The styled error card.
-Key UI: Back/Go Home link.
-________________________________________
-Transactional Emails (Mailpit Previews)
-Use Mailpit to preview; capture one desktop screenshot per template in Arabic RTL.
-26) Order Placed (RTL)
-Template: resources/views/emails/orders/placed.blade.php
-Purpose: Confirmation of order creation before payment.
-Capture: Subject line (RTL), order summary, “View Order” button.
-27) Order Paid (RTL + Invoice PDF)
-Template: resources/views/emails/orders/paid.blade.php
-Purpose: Payment confirmation; includes invoice PDF attachment.
-Capture: Greeting, order details, “View Order” button; show Mailpit header with subject in RTL.
-28) Order Shipped (RTL + Tracking)
-Template: resources/views/emails/orders/shipped.blade.php
-Purpose: Shipping notice with carrier, tracking number, link.
-Capture: Body with tracking info, action button.
-29) Order Cancelled
-Template: resources/views/emails/orders/cancelled.blade.php
-Purpose: Cancellation/refund notice.
-Capture: Reason copy (if provided), support link.
-30) Order Status Updated
-Template: resources/views/emails/orders/status_updated.blade.php
-Purpose: Inform user of status transitions (e.g., processing → shipped).
-Capture: Old/new statuses, CTA.
-________________________________________
-Shared UI Components
-31) Global Page Loader (Full-screen)
-View: resources/views/components/page-loader.blade.php
-Purpose: Show a blocking loader on submits/links; adds ripple effect.
-Capture: Overlay with spinner and “جارٍ التحميل…” text (RTL).
-Key UI: Semi-transparent backdrop, accessible aria tags.
-________________________________________
-32) Center Loader (Inline/Modal Style)
-View: resources/views/components/center-loader.blade.php (optional)
-Purpose: Use inside a card or modal (non-blocking).
-Capture: Single card with spinner + caption centered.
-Key UI: Works with data-loading="center" attributes.
-________________________________________
-33) RTL Pagination
-View: resources/views/vendor/pagination/tailwind-rtl.blade.php
-Purpose: Proper right-to-left pagination arrows and alignment.
-Capture: Pagination bar under a list/grid in RTL.
-Key UI: Active page state, hover states.
-________________________________________
-34) Flash Messages (Stack)
-Component: <x-flash-stack />
-Purpose: Consistent success/error banners with auto-dismiss.
-Capture: A success toast and a warning toast in RTL.
-Key UI: Rounded cards, readable Arabic labels.
-________________________________________
-Optional / Dev Tools
-35) Mailpit Inbox
-URL: http://localhost:8025/
-Purpose: Local email preview.
-Capture: A message list and a selected email in Arabic.
-Key UI: Shows subjects are correctly RTL.
-________________________________________
-36) Stripe Test Dashboard
-URL: https://dashboard.stripe.com/test/
-Purpose: Verify PaymentIntents/charges in test mode.
-Capture: PaymentIntent/Charge record that corresponds to an order.
-Key UI: Useful to demonstrate end-to-end payment flow.
+### 1) 🏠 الصفحة الرئيسية | Home
 
+**الوصف (AR):** صفحة الهبوط تعرض الكتب المميّزة والأقسام وروابط التصفّح والبحث السريع.
+**Description (EN):** Landing page with featured books, categories, quick navigation, and search entry. 
+<img alt="Home" src="docs/screenshots/home.png" width="1200" />
+
+---
+
+### 2) 🗂️ صفحة التصنيف | Category
+
+**الوصف (AR):** تصفّح كتب تصنيف محدّد مع فرز/ترقيم صفحات.
+**Description (EN):** Browse books within a specific category with sorting and pagination. 
+<img alt="Category" src="docs/screenshots/category.png" width="1200" />
+
+---
+
+### 3) 🏢 صفحة الناشر | Publisher
+
+**الوصف (AR):** عرض معلومات الناشر وجميع كتبه المنشورة في المتجر.
+**Description (EN):** Publisher profile and catalog of all published books.
+<img alt="Publisher" src="docs/screenshots/publisher.png" width="1200" />
+
+---
+
+### 4) ✍️ صفحة المؤلف | Author
+
+**الوصف (AR):** نبذة المؤلف وقائمة بأعماله مع روابط للكتب.
+**Description (EN):** Author bio and list of authored books with links.
+<img alt="Author" src="docs/screenshots/author.png" width="1200" />
+
+---
+
+### 5) 📘 تفاصيل الكتاب + المراجعات | Book Details + Reviews
+
+**الوصف (AR):** صفحة المنتج؛ صور/وصف/سعر/توفر/إضافة للسلة، واستعراض/كتابة مراجعات (RTL).
+**Description (EN):** Product page with images, description, price, stock, add-to-cart, and reviews.
+<img alt="Book Details" src="docs/screenshots/book-details.png" width="1200" />
+
+---
+
+### 6) 🛒 سلة التسوّق | Cart
+
+**الوصف (AR):** مراجعة العناصر، تحديث الكميات/الحذف، متابعة الدفع.
+**Description (EN):** Review items, update quantities/remove, proceed to checkout.
+<img alt="Cart" src="docs/screenshots/cart.png" width="1200" />
+
+---
+
+### 7) 💳 صفحة إتمام الطلب | Checkout
+
+**الوصف (AR):** إدخال عناوين الشحن/الفوترة مع ملخّص الطلب قبل الدفع.
+**Description (EN):** Enter shipping/billing information with order summary before payment.
+<img alt="Checkout" src="docs/screenshots/checkout.png" width="1200" />
+
+---
+
+### 8) 🧾 الدفع عبر Stripe | Stripe Payment
+
+**الوصف (AR):** تأكيد الدفع ببطاقة الاختبار، إنشاء PaymentIntent، تحديث الحالة عبر Webhook.
+**Description (EN):** Confirm card payment (test), PaymentIntent creation, webhook-based status updates.
+<img alt="Payment" src="docs/screenshots/payment-stripe.png" width="1200" />
+
+---
+
+### 9) ✅ صفحة الشكر (اختياري) | Thank You (Optional)
+
+**الوصف (AR):** تأكيد إنشاء الطلب مع أزرار متابعة الطلب/الفاتورة.
+**Description (EN):** Post-purchase confirmation with links to order and invoice.
+<img alt="Thank You" src="docs/screenshots/thank-you.png" width="1200" />
+
+---
+
+### 10) 📦 طلباتي (قائمة) | My Orders (List)
+
+**الوصف (AR):** قائمة طلبات العميل مع حالة الدفع والطلب وترقيم الصفحات.
+**Description (EN):** Customer’s order list with payment/order status and pagination.
+<img alt="My Orders" src="docs/screenshots/my-orders.png" width="1200" />
+
+---
+
+### 11) 🔍 تفاصيل الطلب (عميل) | Order Details (Customer)
+
+**الوصف (AR):** تفصيل العناصر والمبالغ والإجراءات (دفع/إلغاء/فاتورة).
+**Description (EN):** Full breakdown of items, totals, and actions (pay/cancel/invoice).
+<img alt="Order Details" src="docs/screenshots/11-order-details.png" width="1200" />
+
+---
+
+### 12) 🧾 فاتورة HTML | Invoice (HTML)
+
+**الوصف (AR):** عرض الفاتورة للطباعة باتجاه عربي (RTL).
+**Description (EN):** Printable invoice view with Arabic RTL styling.
+<img alt="Invoice HTML" src="docs/screenshots/12-invoice-html.png" width="1200" />
+
+---
+
+### 13) 📄 فاتورة PDF | Invoice PDF
+
+**الوصف (AR):** تنزيل الفاتورة بصيغة PDF (mPDF) مع دعم العربية.
+**Description (EN):** Downloadable mPDF invoice with Arabic support.
+<img alt="Invoice PDF" src="docs/screenshots/13-invoice-pdf-viewer.png" width="1200" />
+
+---
+
+## 👑 الإدارة | Admin
+
+### 14) 🧭 لوحة التحكم | Admin Dashboard
+
+**الوصف (AR):** نظرة عامة وإحصاءات وروابط سريعة للإدارة.
+**Description (EN):** Overview, quick stats, and shortcuts for administration.
+<img alt="Admin Dashboard" src="docs/screenshots/14-admin-dashboard.png" width="1200" />
+
+---
+
+### 15) 📚 إدارة الكتب – القائمة | Admin Books – Index
+
+**الوصف (AR):** استعراض وإدارة الكتب مع بحث/ترقيم.
+**Description (EN):** Manage books with listing, search, and pagination.
+<img alt="Admin Books Index" src="docs/screenshots/15-admin-books-index.png" width="1200" />
+
+---
+
+### 16) ✏️ إدارة الكتب – إنشاء/تعديل | Admin Books – Create/Edit
+
+**الوصف (AR):** إنشاء كتاب جديد أو تعديل البيانات والسعر والمخزون والصور.
+**Description (EN):** Create new book or edit metadata, pricing, stock, and images.
+<img alt="Admin Books Edit" src="docs/screenshots/16-admin-books-edit.png" width="1200" />
+
+---
+
+### 17) 🏷️ التصنيفات | Admin Categories
+
+**الوصف (AR):** إدارة التصنيفات وإسنادها للكتب.
+**Description (EN):** Manage categories and assign them to books.
+<img alt="Admin Categories" src="docs/screenshots/17-admin-categories.png" width="1200" />
+
+---
+
+### 18) 🏢 الناشرون | Admin Publishers
+
+**الوصف (AR):** إنشاء/تعديل الناشرين وإدارة كتبهم.
+**Description (EN):** Create/edit publishers and manage their books.
+<img alt="Admin Publishers" src="docs/screenshots/18-admin-publishers.png" width="1200" />
+
+---
+
+### 19) ✍️ المؤلفون | Admin Authors
+
+**الوصف (AR):** إدارة المؤلفين وربطهم بالكتب.
+**Description (EN):** Manage authors and link them to books.
+<img alt="Admin Authors" src="docs/screenshots/19-admin-authors.png" width="1200" />
+
+---
+
+### 20) 👥 المستخدمون | Admin Users
+
+**الوصف (AR):** إدارة المستخدمين والصلاحيات (Spatie Roles/Permissions).
+**Description (EN):** Manage users and roles/permissions (Spatie).
+<img alt="Admin Users" src="docs/screenshots/20-admin-users.png" width="1200" />
+
+---
+
+### 21) ⭐ مراجعات | Admin Reviews (Moderation)
+
+**الوصف (AR):** مراجعة/قبول/رفض التقييمات مع بحث وتصنيف.
+**Description (EN):** Moderate reviews with search and status filters.
+<img alt="Admin Reviews" src="docs/screenshots/21-admin-reviews.png" width="1200" />
+
+---
+
+### 22) 🧾 الطلبات – القائمة مع فلاتر | Admin Orders – Index (Filters)
+
+**الوصف (AR):** بحث وترشيح الطلبات حسب الحالة/الدفع/التاريخ/البريد.
+**Description (EN):** Search and filter orders by status/payment/date/email.
+<img alt="Admin Orders Index" src="docs/screenshots/22-admin-orders-index-filters.png" width="1200" />
+
+---
+
+### 23) 🔎 تفاصيل الطلب وإجراءات | Admin Order – Details & Actions
+
+**الوصف (AR):** عرض كامل للطلب (عناصر/مبالغ/معرّفات Stripe) مع إجراءات (استرجاع/تغيير حالة/تتبع شحنة).
+**Description (EN):** Full order view (items/totals/Stripe IDs) with actions (refund/status/ship).
+<img alt="Admin Order Details" src="docs/screenshots/23-admin-order-details.png" width="1200" />
+
+---
+
+## 🔐 المصادقة والأخطاء | Auth & Errors
+
+### 24) 🔑 تسجيل الدخول | Login
+
+**الوصف (AR):** وصول آمن بحقول البريد/كلمة المرور ودعم RTL.
+**Description (EN):** Secure access with email/password and RTL-friendly UI.
+<img alt="Login" src="docs/screenshots/24-auth-login.png" width="1200" />
+
+---
+
+### 25) 📝 إنشاء حساب | Register
+
+**الوصف (AR):** إنشاء حساب جديد مع التحقق من البيانات.
+**Description (EN):** Sign-up form with basic validation flows.
+<img alt="Register" src="docs/screenshots/25-auth-register.png" width="1200" />
+
+---
+
+### 26) ✉️ تأكيد البريد | Email Verification
+
+**الوصف (AR):** تفعيل البريد الإلكتروني قبل الميزات الحسّاسة.
+**Description (EN):** Verify email before sensitive features.
+<img alt="Verify Email" src="docs/screenshots/26-auth-verify.png" width="1200" />
+
+---
+
+### 27) 🚫 خطأ 403 | Error 403
+
+**الوصف (AR):** شاشة ودّية عند عدم السماح بالوصول.
+**Description (EN):** Friendly unauthorized screen for forbidden access.
+<img alt="403" src="docs/screenshots/27-error-403.png" width="1200" />
+
+---
+
+## 📬 رسائل البريد (Mailpit) | Transactional Emails (Mailpit)
+
+> **Open Mailpit:** [http://localhost:8025](http://localhost:8025)
+
+### 28)📨 تأكيد إنشاء الطلب | Order Placed
+
+**AR:** رسالة إنشاء الطلب مع ملخص مختصر ورابط التتبع.
+**EN:** “Order placed” confirmation with brief summary and link. 
+<img alt="Email Placed" src="docs/screenshots/28-email-placed.png" width="1200" />
+
+### 29)💳 تأكيد الدفع (مع فاتورة PDF) | Order Paid (Invoice PDF)
+
+**AR:** تأكيد الدفع وإرفاق الفاتورة PDF (RTL).
+**EN:** Payment confirmation with invoice PDF attached (RTL-friendly). 
+<img alt="Email Paid" src="docs/screenshots/29-email-paid.png" width="1200" />
+
+### 30)📦 تم الشحن | Order Shipped
+
+**AR:** إشعار الشحن مع رقم/رابط التتبع.
+**EN:** Shipping notice with tracking number/link. <img alt="Email Shipped" src="docs/screenshots/30-email-shipped.png" width="1200" />
+
+### 31)❌ تم الإلغاء | Order Cancelled
+
+**AR:** إشعار إلغاء الطلب واسترجاع المبلغ (إن وُجد).
+**EN:** Cancellation email and refund note if applicable. 
+<img alt="Email Cancelled" src="docs/screenshots/31-email-cancelled.png" width="1200" />
+
+### 32) 🔄 تحديث حالة الطلب | Order Status Updated
+
+**AR:** إشعار تغيّر الحالة (processing/shipped...).
+**EN:** Status change notice (processing/shipped...). 
+<img alt="Email Status Updated" src="docs/screenshots/32-email-status-updated.png" width="1200" />
+
+---
+
+## 🧩 مكوّنات مشتركة | Shared UI Components
+
+### 33) ⏳ مُحمّل الصفحة العام | Global Page Loader
+
+**AR:** ستار تحميل يغطي الشاشة مع تأثير Ripple على الأزرار.
+**EN:** Full-screen loader overlay with button ripple effect.
+<img alt="Loader Fullscreen" src="docs/screenshots/33-loader-fullscreen.png" width="1200" />
+
+### 34) ⚪ مُحمّل مركزي داخل بطاقة | Centered Loader (Inline)
+
+**AR:** لودر مركزي أنيق يستخدم داخل بطاقة/مودال.
+**EN:** Elegant centered loader for cards/modals.
+<img alt="Loader Center" src="docs/screenshots/34-loader-center.png" width="1200" />
+
+---
+
+## 🧰 أدوات التطوير | Dev Tools
+
+### 35) 📮 صندوق بريد Mailpit | Mailpit Inbox
+
+**AR:** استعراض رسائل النظام أثناء التطوير.
+**EN:** Inspect transactional emails during development.
+**Open:** [Mailpit](http://localhost:8025) 
+<img alt="Mailpit" src="docs/screenshots/35-mailpit.png" width="1200" />
+
+### 36) 💼 Stripe Test Dashboard
+
+**AR:** متابعة عمليات الدفع التجريبية وأحداث الويب هوك.
+**EN:** Monitor test payments and webhooks.
+<img alt="Stripe Dashboard" src="docs/screenshots/36-stripe-dashboard.png" width="1200" />
 
 ---
 
