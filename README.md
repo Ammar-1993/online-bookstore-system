@@ -38,292 +38,149 @@ A modern, RTL-ready (Arabic) online bookstore built with **Laravel 12**, featuri
 
 ## لقطات الشاشة | Screenshots
 
+🏠 الصفحة الرئيسية | Home
 
-### 1) 🏠 الصفحة الرئيسية | Home
+صفحة الهبوط تعرض الكتب المميّزة والأقسام وروابط التصفّح والبحث السريع. <img alt="Home" src="docs/screenshots/home.png" width="1200" />
 
-**الوصف (AR):** صفحة الهبوط تعرض الكتب المميّزة والأقسام وروابط التصفّح والبحث السريع.
-**Description (EN):** Landing page with featured books, categories, quick navigation, and search entry. 
-<img alt="Home" src="docs/screenshots/home.png" width="1200" />
+🗂️ صفحة التصنيف | Category
 
----
+تصفّح كتب تصنيف معيّن مع خيارات الفرز والترقيم. <img alt="Category" src="docs/screenshots/category.png" width="1200" />
 
-### 2) 🗂️ صفحة التصنيف | Category
+🏢 صفحة الناشر | Publisher
 
-**الوصف (AR):** تصفّح كتب تصنيف محدّد مع فرز/ترقيم صفحات.
-**Description (EN):** Browse books within a specific category with sorting and pagination. 
-<img alt="Category" src="docs/screenshots/category.png" width="1200" />
+عرض بيانات الناشر وكامل كتبه المنشورة في المتجر. <img alt="Publisher" src="docs/screenshots/publisher.png" width="1200" />
 
----
+✍️ صفحة المؤلف | Author
 
-### 3) 🏢 صفحة الناشر | Publisher
+نبذة المؤلف وقائمة أعماله مع روابط تفصيل الكتب. <img alt="Author" src="docs/screenshots/author.png" width="1200" />
 
-**الوصف (AR):** عرض معلومات الناشر وجميع كتبه المنشورة في المتجر.
-**Description (EN):** Publisher profile and catalog of all published books.
-<img alt="Publisher" src="docs/screenshots/publisher.png" width="1200" />
+📘 تفاصيل الكتاب + المراجعات | Book Details + Reviews
 
----
+صفحة المنتج: الصور والوصف والسعر والتوفّر والإضافة للسلة مع استعراض/كتابة المراجعات. <img alt="Book Details" src="docs/screenshots/book-details.png" width="1200" />
 
-### 4) ✍️ صفحة المؤلف | Author
+🛒 سلة التسوّق | Cart
 
-**الوصف (AR):** نبذة المؤلف وقائمة بأعماله مع روابط للكتب.
-**Description (EN):** Author bio and list of authored books with links.
-<img alt="Author" src="docs/screenshots/author.png" width="1200" />
+مراجعة العناصر وتحديث الكميات/الحذف والانتقال لإتمام الطلب. <img alt="Cart" src="docs/screenshots/cart.png" width="1200" />
 
----
+💳 صفحة إتمام الطلب | Checkout
 
-### 5) 📘 تفاصيل الكتاب + المراجعات | Book Details + Reviews
+إدخال عناوين الشحن/الفوترة مع ملخص نهائي قبل الدفع. <img alt="Checkout" src="docs/screenshots/checkout.png" width="1200" />
 
-**الوصف (AR):** صفحة المنتج؛ صور/وصف/سعر/توفر/إضافة للسلة، واستعراض/كتابة مراجعات (RTL).
-**Description (EN):** Product page with images, description, price, stock, add-to-cart, and reviews.
-<img alt="Book Details" src="docs/screenshots/book-details.png" width="1200" />
+🧾 الدفع عبر Stripe | Stripe Payment
 
----
+تأكيد الدفع ببطاقات الاختبار وإنشاء PaymentIntent وتحديث الحالة عبر Webhook. <img alt="Stripe Payment" src="docs/screenshots/payment-stripe.png" width="1200" />
 
-### 6) 🛒 سلة التسوّق | Cart
+✅ صفحة الشكر | Thank You
 
-**الوصف (AR):** مراجعة العناصر، تحديث الكميات/الحذف، متابعة الدفع.
-**Description (EN):** Review items, update quantities/remove, proceed to checkout.
-<img alt="Cart" src="docs/screenshots/cart.png" width="1200" />
+تأكيد إنشاء الطلب مع روابط متابعة الطلب والفاتورة. <img alt="Thank You" src="docs/screenshots/thank-you.png" width="1200" />
 
----
+📦 طلباتي | My Orders
 
-### 7) 💳 صفحة إتمام الطلب | Checkout
+قائمة طلبات العميل مع حالة الدفع والطلب وترقيم الصفحات. <img alt="My Orders" src="docs/screenshots/my-orders.png" width="1200" />
 
-**الوصف (AR):** إدخال عناوين الشحن/الفوترة مع ملخّص الطلب قبل الدفع.
-**Description (EN):** Enter shipping/billing information with order summary before payment.
-<img alt="Checkout" src="docs/screenshots/checkout.png" width="1200" />
+🔍 تفاصيل الطلب (عميل) | Order Details (Customer)
 
----
+تفاصيل العناصر والمبالغ والإجراءات (دفع/إلغاء/عرض الفاتورة). <img alt="Order Details" src="docs/screenshots/order-details.png" width="1200" />
 
-### 8) 🧾 الدفع عبر Stripe | Stripe Payment
+🧾 فاتورة HTML | Invoice (HTML)
 
-**الوصف (AR):** تأكيد الدفع ببطاقة الاختبار، إنشاء PaymentIntent، تحديث الحالة عبر Webhook.
-**Description (EN):** Confirm card payment (test), PaymentIntent creation, webhook-based status updates.
-<img alt="Payment" src="docs/screenshots/payment-stripe.png" width="1200" />
+عرض الفاتورة للطباعة مع دعم اتجاه RTL. <img alt="Invoice HTML" src="docs/screenshots/invoice-html.png" width="1200" />
 
----
+📄 فاتورة PDF | Invoice PDF
 
-### 9) ✅ صفحة الشكر (اختياري) | Thank You (Optional)
+تنزيل الفاتورة بصيغة PDF (mPDF) مع دعم العربية. <img alt="Invoice PDF" src="docs/screenshots/invoice-pdf.png" width="1200" />
 
-**الوصف (AR):** تأكيد إنشاء الطلب مع أزرار متابعة الطلب/الفاتورة.
-**Description (EN):** Post-purchase confirmation with links to order and invoice.
-<img alt="Thank You" src="docs/screenshots/thank-you.png" width="1200" />
+🧭 لوحة التحكم | Admin Dashboard
 
----
+نظرة عامة وإحصاءات وروابط سريعة للإدارة. <img alt="Admin Dashboard" src="docs/screenshots/admin-dashboard.png" width="1200" />
 
-### 10) 📦 طلباتي (قائمة) | My Orders (List)
+📚 إدارة الكتب – القائمة | Admin Books – Index
 
-**الوصف (AR):** قائمة طلبات العميل مع حالة الدفع والطلب وترقيم الصفحات.
-**Description (EN):** Customer’s order list with payment/order status and pagination.
-<img alt="My Orders" src="docs/screenshots/my-orders.png" width="1200" />
+استعراض الكتب مع البحث والترقيم وإجراءات سريعة. <img alt="Admin Books Index" src="docs/screenshots/admin-books-index.png" width="1200" />
 
----
+✏️ إدارة الكتب – إنشاء/تعديل | Admin Books – Create/Edit
 
-### 11) 🔍 تفاصيل الطلب (عميل) | Order Details (Customer)
+إنشاء كتاب جديد أو تعديل البيانات والسعر والمخزون والصور. <img alt="Admin Books Edit" src="docs/screenshots/admin-books-edit.png" width="1200" />
 
-**الوصف (AR):** تفصيل العناصر والمبالغ والإجراءات (دفع/إلغاء/فاتورة).
-**Description (EN):** Full breakdown of items, totals, and actions (pay/cancel/invoice).
-<img alt="Order Details" src="docs/screenshots/11-order-details.png" width="1200" />
+🏷️ التصنيفات | Admin Categories
 
----
+إدارة التصنيفات وربطها بالكتب. <img alt="Admin Categories" src="docs/screenshots/admin-categories.png" width="1200" />
 
-### 12) 🧾 فاتورة HTML | Invoice (HTML)
+🏢 الناشرون | Admin Publishers
 
-**الوصف (AR):** عرض الفاتورة للطباعة باتجاه عربي (RTL).
-**Description (EN):** Printable invoice view with Arabic RTL styling.
-<img alt="Invoice HTML" src="docs/screenshots/12-invoice-html.png" width="1200" />
+إنشاء/تعديل الناشرين وإدارة كتبهم. <img alt="Admin Publishers" src="docs/screenshots/admin-publishers.png" width="1200" />
 
----
+✍️ المؤلفون | Admin Authors
 
-### 13) 📄 فاتورة PDF | Invoice PDF
+إدارة المؤلفين وربطهم بالكتب. <img alt="Admin Authors" src="docs/screenshots/admin-authors.png" width="1200" />
 
-**الوصف (AR):** تنزيل الفاتورة بصيغة PDF (mPDF) مع دعم العربية.
-**Description (EN):** Downloadable mPDF invoice with Arabic support.
-<img alt="Invoice PDF" src="docs/screenshots/13-invoice-pdf-viewer.png" width="1200" />
+👥 المستخدمون | Admin Users
 
----
+إدارة المستخدمين والصلاحيات (Spatie Roles/Permissions). <img alt="Admin Users" src="docs/screenshots/admin-users.png" width="1200" />
 
-## 👑 الإدارة | Admin
+⭐ المراجعات | Admin Reviews (Moderation)
 
-### 14) 🧭 لوحة التحكم | Admin Dashboard
+مراجعة/قبول/رفض التقييمات مع البحث والتصفية. <img alt="Admin Reviews" src="docs/screenshots/admin-reviews.png" width="1200" />
 
-**الوصف (AR):** نظرة عامة وإحصاءات وروابط سريعة للإدارة.
-**Description (EN):** Overview, quick stats, and shortcuts for administration.
-<img alt="Admin Dashboard" src="docs/screenshots/14-admin-dashboard.png" width="1200" />
+🧾 الطلبات – القائمة (فلاتر) | Admin Orders – Index (Filters)
 
----
+بحث وترشيح الطلبات حسب الحالة/الدفع/التاريخ/البريد. <img alt="Admin Orders Index" src="docs/screenshots/admin-orders-index-filters.png" width="1200" />
 
-### 15) 📚 إدارة الكتب – القائمة | Admin Books – Index
+🔎 تفاصيل الطلب والإجراءات | Admin Order – Details & Actions
 
-**الوصف (AR):** استعراض وإدارة الكتب مع بحث/ترقيم.
-**Description (EN):** Manage books with listing, search, and pagination.
-<img alt="Admin Books Index" src="docs/screenshots/15-admin-books-index.png" width="1200" />
+عرض كامل للطلب (عناصر/مبالغ/معرّفات Stripe) مع إجراءات (استرجاع/تغيير حالة/تتبع شحنة). <img alt="Admin Order Details" src="docs/screenshots/admin-order-details.png" width="1200" />
 
----
+🔑 تسجيل الدخول | Login
 
-### 16) ✏️ إدارة الكتب – إنشاء/تعديل | Admin Books – Create/Edit
+وصول آمن بحقول البريد/كلمة المرور ودعم RTL. <img alt="Login" src="docs/screenshots/auth-login.png" width="1200" />
 
-**الوصف (AR):** إنشاء كتاب جديد أو تعديل البيانات والسعر والمخزون والصور.
-**Description (EN):** Create new book or edit metadata, pricing, stock, and images.
-<img alt="Admin Books Edit" src="docs/screenshots/16-admin-books-edit.png" width="1200" />
+📝 إنشاء حساب | Register
 
----
+إنشاء حساب جديد مع التحقق من البيانات. <img alt="Register" src="docs/screenshots/auth-register.png" width="1200" />
 
-### 17) 🏷️ التصنيفات | Admin Categories
+✉️ تأكيد البريد | Email Verification
 
-**الوصف (AR):** إدارة التصنيفات وإسنادها للكتب.
-**Description (EN):** Manage categories and assign them to books.
-<img alt="Admin Categories" src="docs/screenshots/17-admin-categories.png" width="1200" />
+تفعيل البريد الإلكتروني قبل الميزات الحسّاسة. <img alt="Verify Email" src="docs/screenshots/auth-verify.png" width="1200" />
 
----
+🚫 خطأ 403 | Error 403
 
-### 18) 🏢 الناشرون | Admin Publishers
+شاشة ودّية عند عدم السماح بالوصول. <img alt="403" src="docs/screenshots/error-403.png" width="1200" />
 
-**الوصف (AR):** إنشاء/تعديل الناشرين وإدارة كتبهم.
-**Description (EN):** Create/edit publishers and manage their books.
-<img alt="Admin Publishers" src="docs/screenshots/18-admin-publishers.png" width="1200" />
+📨 بريد: تأكيد إنشاء الطلب | Email: Order Placed
 
----
+رسالة إنشاء الطلب مع ملخص مختصر ورابط التتبع. <img alt="Email Placed" src="docs/screenshots/email-placed.png" width="1200" />
 
-### 19) ✍️ المؤلفون | Admin Authors
+💳 بريد: تأكيد الدفع | Email: Order Paid
 
-**الوصف (AR):** إدارة المؤلفين وربطهم بالكتب.
-**Description (EN):** Manage authors and link them to books.
-<img alt="Admin Authors" src="docs/screenshots/19-admin-authors.png" width="1200" />
+تأكيد الدفع وإرفاق الفاتورة PDF (RTL). <img alt="Email Paid" src="docs/screenshots/email-paid.png" width="1200" />
 
----
+📦 بريد: تم الشحن | Email: Order Shipped
 
-### 20) 👥 المستخدمون | Admin Users
+إشعار الشحن مع رقم/رابط التتبع. <img alt="Email Shipped" src="docs/screenshots/email-shipped.png" width="1200" />
 
-**الوصف (AR):** إدارة المستخدمين والصلاحيات (Spatie Roles/Permissions).
-**Description (EN):** Manage users and roles/permissions (Spatie).
-<img alt="Admin Users" src="docs/screenshots/20-admin-users.png" width="1200" />
+❌ بريد: تم الإلغاء | Email: Order Cancelled
 
----
+إشعار إلغاء الطلب واسترجاع المبلغ (إن وُجد). <img alt="Email Cancelled" src="docs/screenshots/email-cancelled.png" width="1200" />
 
-### 21) ⭐ مراجعات | Admin Reviews (Moderation)
+🔄 بريد: تحديث حالة الطلب | Email: Order Status Updated
 
-**الوصف (AR):** مراجعة/قبول/رفض التقييمات مع بحث وتصنيف.
-**Description (EN):** Moderate reviews with search and status filters.
-<img alt="Admin Reviews" src="docs/screenshots/21-admin-reviews.png" width="1200" />
+إشعار تغيّر الحالة (processing/shipped…). <img alt="Email Status Updated" src="docs/screenshots/email-status-updated.png" width="1200" />
 
----
+⏳ مُحمّل الصفحة العام | Global Page Loader
 
-### 22) 🧾 الطلبات – القائمة مع فلاتر | Admin Orders – Index (Filters)
+ستار تحميل يغطي الشاشة مع تأثير Ripple على الأزرار. <img alt="Loader Fullscreen" src="docs/screenshots/loader-fullscreen.png" width="1200" />
 
-**الوصف (AR):** بحث وترشيح الطلبات حسب الحالة/الدفع/التاريخ/البريد.
-**Description (EN):** Search and filter orders by status/payment/date/email.
-<img alt="Admin Orders Index" src="docs/screenshots/22-admin-orders-index-filters.png" width="1200" />
+⚪ مُحمّل مركزي داخل بطاقة | Centered Loader (Inline)
 
----
+لودر مركزي أنيق للاستخدام داخل بطاقة/مودال. <img alt="Loader Center" src="docs/screenshots/loader-center.png" width="1200" />
 
-### 23) 🔎 تفاصيل الطلب وإجراءات | Admin Order – Details & Actions
+📮 Mailpit | Mailpit Inbox
 
-**الوصف (AR):** عرض كامل للطلب (عناصر/مبالغ/معرّفات Stripe) مع إجراءات (استرجاع/تغيير حالة/تتبع شحنة).
-**Description (EN):** Full order view (items/totals/Stripe IDs) with actions (refund/status/ship).
-<img alt="Admin Order Details" src="docs/screenshots/23-admin-order-details.png" width="1200" />
+استعراض رسائل النظام أثناء التطوير. <img alt="Mailpit" src="docs/screenshots/mailpit.png" width="1200" />
 
----
+💼 Stripe Test Dashboard | Stripe Test Dashboard
 
-## 🔐 المصادقة والأخطاء | Auth & Errors
-
-### 24) 🔑 تسجيل الدخول | Login
-
-**الوصف (AR):** وصول آمن بحقول البريد/كلمة المرور ودعم RTL.
-**Description (EN):** Secure access with email/password and RTL-friendly UI.
-<img alt="Login" src="docs/screenshots/24-auth-login.png" width="1200" />
-
----
-
-### 25) 📝 إنشاء حساب | Register
-
-**الوصف (AR):** إنشاء حساب جديد مع التحقق من البيانات.
-**Description (EN):** Sign-up form with basic validation flows.
-<img alt="Register" src="docs/screenshots/25-auth-register.png" width="1200" />
-
----
-
-### 26) ✉️ تأكيد البريد | Email Verification
-
-**الوصف (AR):** تفعيل البريد الإلكتروني قبل الميزات الحسّاسة.
-**Description (EN):** Verify email before sensitive features.
-<img alt="Verify Email" src="docs/screenshots/26-auth-verify.png" width="1200" />
-
----
-
-### 27) 🚫 خطأ 403 | Error 403
-
-**الوصف (AR):** شاشة ودّية عند عدم السماح بالوصول.
-**Description (EN):** Friendly unauthorized screen for forbidden access.
-<img alt="403" src="docs/screenshots/27-error-403.png" width="1200" />
-
----
-
-## 📬 رسائل البريد (Mailpit) | Transactional Emails (Mailpit)
-
-> **Open Mailpit:** [http://localhost:8025](http://localhost:8025)
-
-### 28)📨 تأكيد إنشاء الطلب | Order Placed
-
-**AR:** رسالة إنشاء الطلب مع ملخص مختصر ورابط التتبع.
-**EN:** “Order placed” confirmation with brief summary and link. 
-<img alt="Email Placed" src="docs/screenshots/28-email-placed.png" width="1200" />
-
-### 29)💳 تأكيد الدفع (مع فاتورة PDF) | Order Paid (Invoice PDF)
-
-**AR:** تأكيد الدفع وإرفاق الفاتورة PDF (RTL).
-**EN:** Payment confirmation with invoice PDF attached (RTL-friendly). 
-<img alt="Email Paid" src="docs/screenshots/29-email-paid.png" width="1200" />
-
-### 30)📦 تم الشحن | Order Shipped
-
-**AR:** إشعار الشحن مع رقم/رابط التتبع.
-**EN:** Shipping notice with tracking number/link. <img alt="Email Shipped" src="docs/screenshots/30-email-shipped.png" width="1200" />
-
-### 31)❌ تم الإلغاء | Order Cancelled
-
-**AR:** إشعار إلغاء الطلب واسترجاع المبلغ (إن وُجد).
-**EN:** Cancellation email and refund note if applicable. 
-<img alt="Email Cancelled" src="docs/screenshots/31-email-cancelled.png" width="1200" />
-
-### 32) 🔄 تحديث حالة الطلب | Order Status Updated
-
-**AR:** إشعار تغيّر الحالة (processing/shipped...).
-**EN:** Status change notice (processing/shipped...). 
-<img alt="Email Status Updated" src="docs/screenshots/32-email-status-updated.png" width="1200" />
-
----
-
-## 🧩 مكوّنات مشتركة | Shared UI Components
-
-### 33) ⏳ مُحمّل الصفحة العام | Global Page Loader
-
-**AR:** ستار تحميل يغطي الشاشة مع تأثير Ripple على الأزرار.
-**EN:** Full-screen loader overlay with button ripple effect.
-<img alt="Loader Fullscreen" src="docs/screenshots/33-loader-fullscreen.png" width="1200" />
-
-### 34) ⚪ مُحمّل مركزي داخل بطاقة | Centered Loader (Inline)
-
-**AR:** لودر مركزي أنيق يستخدم داخل بطاقة/مودال.
-**EN:** Elegant centered loader for cards/modals.
-<img alt="Loader Center" src="docs/screenshots/34-loader-center.png" width="1200" />
-
----
-
-## 🧰 أدوات التطوير | Dev Tools
-
-### 35) 📮 صندوق بريد Mailpit | Mailpit Inbox
-
-**AR:** استعراض رسائل النظام أثناء التطوير.
-**EN:** Inspect transactional emails during development.
-**Open:** [Mailpit](http://localhost:8025) 
-<img alt="Mailpit" src="docs/screenshots/35-mailpit.png" width="1200" />
-
-### 36) 💼 Stripe Test Dashboard
-
-**AR:** متابعة عمليات الدفع التجريبية وأحداث الويب هوك.
-**EN:** Monitor test payments and webhooks.
-<img alt="Stripe Dashboard" src="docs/screenshots/36-stripe-dashboard.png" width="1200" />
+متابعة عمليات الدفع التجريبية وأحداث الويب هوك. <img alt="Stripe Dashboard" src="docs/screenshots/stripe-dashboard.png" width="1200" />
 
 ---
 
