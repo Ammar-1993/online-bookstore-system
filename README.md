@@ -280,7 +280,7 @@ In `.env`, use the Sail service hosts:
 ```dotenv
 APP_NAME="Online Bookstore"
 APP_ENV=local
-APP_URL=http://localhost
+APP_URL=http://localhost:8088
 
 DB_CONNECTION=mysql
 DB_HOST=mysql
