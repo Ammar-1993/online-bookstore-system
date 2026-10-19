@@ -3,17 +3,17 @@
         <x-slot name="logo">
             <x-authentication-card-logo />
             <div class="mt-3 text-center">
-                <h1 class="text-xl font-semibold text-gray-900">استعادة كلمة المرور</h1>
-                <p class="text-sm text-gray-500 mt-1">أدخل بريدك الإلكتروني لإرسال رابط إعادة التعيين</p>
+                <h1 class="text-xl font-semibold text-gray-900 dark:text-gray-100">استعادة كلمة المرور</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">أدخل بريدك الإلكتروني لإرسال رابط إعادة التعيين</p>
             </div>
         </x-slot>
 
-        <div class="mb-4 text-sm text-gray-600 text-right">
+        <div class="mb-4 text-sm text-gray-600 dark:text-gray-400 text-right">
             نسيت كلمة المرور؟ لا مشكلة. فقط أخبرنا بعنوان بريدك الإلكتروني وسنرسل لك رابطًا لإعادة تعيين كلمة المرور.
         </div>
 
         @session('status')
-            <div class="mb-4 font-medium text-sm text-emerald-600" role="status">
+            <div class="mb-4 font-medium text-sm text-emerald-600 dark:text-emerald-400" role="status">
                 {{ $value }}
             </div>
         @endsession
@@ -25,11 +25,11 @@
 
             {{-- البريد الإلكتروني --}}
             <div class="block">
-                <x-label for="email" value="البريد الإلكتروني" class="mb-1 block text-black text-right" />
+                <x-label for="email" value="البريد الإلكتروني" class="mb-1 block text-gray-700 dark:text-gray-200 text-right" />
                 <div class="relative">
                     <x-input id="email"
-                        class="block mt-1 w-full ps-12 pe-4 rounded-xl bg-white text-gray-900 placeholder-gray-400
-                               ring-1 ring-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        class="block mt-1 w-full ps-12 pe-4 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500
+                               ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         type="email" name="email" :value="old('email')" required autofocus
                         autocomplete="username" inputmode="email" autocapitalize="off" spellcheck="false"
                         dir="ltr" placeholder="name@domain.com"
@@ -37,7 +37,7 @@
                         aria-invalid="@error('email')true@enderror" />
 
                     {{-- أيقونة البريد في بداية الحقل (تدعم RTL/LTR) --}}
-                    <div class="pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-400"
+                    <div class="pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
                          style="inset-inline-start:0.75rem" aria-hidden="true">
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
                             <path d="M4 6h16v12H4z" stroke="currentColor" stroke-width="2" />
@@ -53,7 +53,7 @@
             {{-- الإجراءات --}}
             <div class="flex items-center justify-between mt-6">
                 @if (Route::has('login'))
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                    <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                        href="{{ route('login') }}">
                         الرجوع لتسجيل الدخول
                     </a>
@@ -61,8 +61,8 @@
 
                 <x-button type="submit" data-submit
                     class="w-full sm:w-auto ms-4 inline-flex items-center justify-center gap-2 rounded-xl px-6 py-2.5 min-w-[12rem]
-                           bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-600/80 disabled:cursor-not-allowed
-                           text-white shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500">
+                           bg-indigo-600 dark:bg-indigo-600 hover:bg-indigo-700 dark:hover:bg-indigo-500 disabled:bg-indigo-600/80 disabled:cursor-not-allowed
+                           text-white dark:text-white shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500">
                     <svg class="w-5 h-5 hidden motion-safe:inline" viewBox="0 0 24 24" fill="none" data-spinner aria-hidden="true">
                         <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" opacity=".25" />
                         <path d="M21 12a9 9 0 0 1-9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" />

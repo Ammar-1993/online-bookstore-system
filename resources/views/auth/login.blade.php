@@ -25,10 +25,10 @@
 
             {{-- البريد الإلكتروني --}}
             <div>
-                <x-label for="email" value="البريد الإلكتروني" class="mb-1 text-gray-700 dark:text-black-200 text-right" />
+                <x-label for="email" value="البريد الإلكتروني" class="mb-1 text-gray-700 dark:text-gray-200 text-right" />
                 <div class="relative">
-                    <x-input id="email"   class="block mt-1 w-full ps-12 pe-4 rounded-xl bg-white text-gray-900 placeholder-gray-400
-                               ring-1 ring-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    <x-input id="email"   class="block mt-1 w-full ps-12 pe-4 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500
+                               ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         type="email" name="email" :value="old('email')" required
                         autocomplete="username" inputmode="email" autocapitalize="off" spellcheck="false"
                         dir="ltr" placeholder="name@domain.com"
@@ -48,10 +48,10 @@
 
             {{-- كلمة المرور --}}
             <div class="mt-4">
-                <x-label for="password" value="كلمة المرور" class="mb-1 text-gray-700 dark:text-black-200 text-right" />
+                <x-label for="password" value="كلمة المرور" class="mb-1 text-gray-700 dark:text-gray-200 text-right" />
                 <div class="relative">
-                    <x-input id="password" class="block mt-1 w-full ps-12 pe-12 rounded-xl bg-white text-gray-900 placeholder-gray-400
-                               ring-1 ring-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                    <x-input id="password" class="block mt-1 w-full ps-12 pe-12 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500
+                               ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         type="password" name="password" required autocomplete="new-password"
                         placeholder="••••••••"
                         aria-describedby="caps_hint @error('password') password_error @enderror"
@@ -93,7 +93,7 @@
             <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mt-5">
                 <label class="inline-flex items-center gap-2 text-sm select-none">
                     <input id="remember" name="remember" type="checkbox"
-                        class="rounded border-gray-300 dark:border-gray-700 text-indigo-600 focus:ring-indigo-500" />
+                        class="rounded border-gray-300 dark:border-gray-700 dark:bg-gray-800 text-indigo-600 focus:ring-indigo-500" />
                     <span class="text-gray-700 dark:text-gray-300">تذكّرني</span>
                 </label>
 
@@ -118,8 +118,8 @@
             <div class="mt-6">
                 <x-button type="submit" data-submit
                     class="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-xl px-6 py-2.5 min-w-[10rem]
-                           bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-600/80 disabled:cursor-not-allowed
-                           text-white shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500"
+                           bg-indigo-600 dark:bg-indigo-600 hover:bg-indigo-700 dark:hover:bg-indigo-500 disabled:bg-indigo-600/80 disabled:cursor-not-allowed
+                           text-white dark:text-white shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500"
                     data-ripple>
                     <svg class="w-5 h-5 hidden motion-safe:inline" viewBox="0 0 24 24" fill="none" data-spinner
                         aria-hidden="true">

@@ -3,8 +3,8 @@
         <x-slot name="logo">
             <x-authentication-card-logo />
             <div class="mt-3 text-center">
-                <h1 class="text-xl font-semibold text-gray-900">إنشاء حساب</h1>
-                <p class="text-sm text-gray-500 mt-1">أهلاً بك 👋</p>
+                <h1 class="text-xl font-semibold text-gray-900 dark:text-gray-100">إنشاء حساب</h1>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">أهلاً بك 👋</p>
             </div>
         </x-slot>
 
@@ -16,16 +16,16 @@
 
             {{-- الاسم --}}
             <div>
-                <x-label for="name" value="الاسم" class="mb-1 block text-black text-right" />
+                <x-label for="name" value="الاسم" class="mb-1 block text-gray-700 dark:text-gray-200 text-right" />
                 <div class="relative">
                     <x-input id="name"
-                        class="block mt-1 w-full ps-12 pe-4 rounded-xl bg-white text-gray-900 placeholder-gray-400
-                               ring-1 ring-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        class="block mt-1 w-full ps-12 pe-4 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500
+                               ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         type="text" name="name" :value="old('name')" required autofocus
                         placeholder="الاسم الكامل"
                         aria-describedby="@error('name') name_error @enderror"
                         aria-invalid="@error('name')true@enderror" />
-                    <div class="pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-400"
+                    <div class="pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
                          style="inset-inline-start:0.75rem" aria-hidden="true">
                         {{-- user icon --}}
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
@@ -41,17 +41,17 @@
 
             {{-- البريد الإلكتروني --}}
             <div class="mt-4">
-                <x-label for="email" value="البريد الإلكتروني" class="mb-1 block text-black text-right" />
+                <x-label for="email" value="البريد الإلكتروني" class="mb-1 block text-gray-700 dark:text-gray-200 text-right" />
                 <div class="relative">
                     <x-input id="email"
-                        class="block mt-1 w-full ps-12 pe-4 rounded-xl bg-white text-gray-900 placeholder-gray-400
-                               ring-1 ring-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        class="block mt-1 w-full ps-12 pe-4 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500
+                               ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         type="email" name="email" :value="old('email')" required
                         autocomplete="username" inputmode="email" autocapitalize="off" spellcheck="false"
                         dir="ltr" placeholder="name@domain.com"
                         aria-describedby="email_hint @error('email') email_error @enderror"
                         aria-invalid="@error('email')true@enderror" />
-                    <div class="pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-400"
+                    <div class="pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
                          style="inset-inline-start:0.75rem" aria-hidden="true">
                         {{-- mail icon --}}
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
@@ -67,17 +67,17 @@
 
             {{-- كلمة المرور --}}
             <div class="mt-4">
-                <x-label for="password" value="كلمة المرور" class="mb-1 block text-black text-right" />
+                <x-label for="password" value="كلمة المرور" class="mb-1 block text-gray-700 dark:text-gray-200 text-right" />
                 <div class="relative">
                     <x-input id="password"
-                        class="block mt-1 w-full ps-12 pe-12 rounded-xl bg-white text-gray-900 placeholder-gray-400
-                               ring-1 ring-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        class="block mt-1 w-full ps-12 pe-12 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500
+                               ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         type="password" name="password" required autocomplete="new-password"
                         placeholder="••••••••"
                         aria-describedby="caps_hint @error('password') password_error @enderror"
                         aria-invalid="@error('password')true@enderror" />
                     {{-- أيقونة القفل في بداية الحقل --}}
-                    <div class="pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-400"
+                    <div class="pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
                          style="inset-inline-start:0.75rem" aria-hidden="true">
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
                             <path d="M7 11V8a5 5 0 0 1 10 0v3M6 11h12v9H6z" stroke="currentColor" stroke-width="2"/>
@@ -86,7 +86,7 @@
                     {{-- زر إظهار/إخفاء كلمة المرور في نهاية الحقل --}}
                     <button type="button"
                         class="absolute top-1/2 -translate-y-1/2 w-9 h-9 grid place-items-center rounded-lg
-                               text-gray-500 hover:text-gray-700 focus:outline-none focus-visible:ring-2
+                               text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none focus-visible:ring-2
                                focus-visible:ring-offset-2 focus-visible:ring-indigo-500"
                         style="inset-inline-end:0.5rem"
                         aria-label="إظهار/إخفاء كلمة المرور" aria-pressed="false"
@@ -111,14 +111,14 @@
 
             {{-- تأكيد كلمة المرور --}}
             <div class="mt-4">
-                <x-label for="password_confirmation" value="تأكيد كلمة المرور" class="mb-1 block text-black text-right" />
+                <x-label for="password_confirmation" value="تأكيد كلمة المرور" class="mb-1 block text-gray-700 dark:text-gray-200 text-right" />
                 <div class="relative">
                     <x-input id="password_confirmation"
-                        class="block mt-1 w-full ps-12 pe-12 rounded-xl bg-white text-gray-900 placeholder-gray-400
-                               ring-1 ring-gray-200 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        class="block mt-1 w-full ps-12 pe-12 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500
+                               ring-1 ring-gray-200 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                         type="password" name="password_confirmation" required autocomplete="new-password"
                         placeholder="••••••••" />
-                    <div class="pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-400"
+                    <div class="pointer-events-none absolute top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500"
                          style="inset-inline-start:0.75rem" aria-hidden="true">
                         {{-- lock-check --}}
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
@@ -128,7 +128,7 @@
                     </div>
                     <button type="button"
                         class="absolute top-1/2 -translate-y-1/2 w-9 h-9 grid place-items-center rounded-lg
-                               text-gray-500 hover:text-gray-700 focus:outline-none focus-visible:ring-2
+                               text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 focus:outline-none focus-visible:ring-2
                                focus-visible:ring-offset-2 focus-visible:ring-indigo-500"
                         style="inset-inline-end:0.5rem"
                         aria-label="إظهار/إخفاء تأكيد كلمة المرور" aria-pressed="false"
@@ -151,15 +151,15 @@
                 <div class="mt-4">
                     <label for="terms" class="inline-flex items-start gap-2 text-sm">
                         <x-checkbox name="terms" id="terms" required />
-                        <span class="text-gray-700">
+                        <span class="text-gray-700 dark:text-gray-300">
                             أوافق على
                             <a target="_blank" href="{{ route('terms.show') }}"
-                               class="underline text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                               class="underline text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 شروط الخدمة
                             </a>
                             و
                             <a target="_blank" href="{{ route('policy.show') }}"
-                               class="underline text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                               class="underline text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                                 سياسة الخصوصية
                             </a>
                         </span>
@@ -168,15 +168,15 @@
             @endif
 
             <div class="flex items-center justify-between mt-6">
-                <a class="underline text-sm text-gray-600 hover:text-gray-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                <a class="underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
                    href="{{ route('login') }}">
                     لديك حساب بالفعل؟
                 </a>
 
                 <x-button type="submit" data-submit
                     class="w-full sm:w-auto ms-4 inline-flex items-center justify-center gap-2 rounded-xl px-6 py-2.5 min-w-[10rem]
-                           bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-600/80 disabled:cursor-not-allowed
-                           text-white shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500">
+                           bg-indigo-600 dark:bg-indigo-600 hover:bg-indigo-700 dark:hover:bg-indigo-500 disabled:bg-indigo-600/80 disabled:cursor-not-allowed
+                           text-white dark:text-white shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500">
                     <svg class="w-5 h-5 hidden motion-safe:inline" viewBox="0 0 24 24" fill="none" data-spinner aria-hidden="true">
                         <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2" opacity=".25" />
                         <path d="M21 12a9 9 0 0 1-9 9" stroke="currentColor" stroke-width="2" stroke-linecap="round" />

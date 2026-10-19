@@ -1,9 +1,8 @@
 @php
     /** @var \App\Models\Publisher $publisher */
-    // كلاس موحّد لكل الحقول: أبيض/أسود + حدود واضحة + فوكس أزرق
-    $ctrl = 'w-full rounded-xl bg-white text-black placeholder-gray-500
-             ring-1 ring-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500
-             dark:bg-white dark:text-black';
+    // كلاس موحّد لكل الحقول
+    $ctrl = 'w-full rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400
+             ring-1 ring-gray-300 dark:ring-gray-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500';
 @endphp
 
 <div class="grid md:grid-cols-2 gap-4">
@@ -39,7 +38,7 @@
 
         <input type="file" id="logo" name="logo" accept="image/*"
                class="block text-sm {{ $ctrl }} file:me-3 file:px-3 file:py-1.5 file:rounded-lg
-                      file:border-0 file:bg-gray-100 file:text-gray-700 hover:file:bg-gray-200">
+                      file:border-0 file:bg-gray-100 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-gray-200 hover:file:bg-gray-200 dark:hover:file:bg-gray-600">
 
         <div class="mt-2 flex items-center gap-3">
             @if(!empty($publisher->logo_path))

@@ -2,7 +2,7 @@
 @section('title', 'عرض كتاب')
 
 @section('content')
-<a href="{{ route('admin.books.index') }}" class="px-3 py-2 rounded bg-gray-200">← رجوع</a>
+<a href="{{ route('admin.books.index') }}" class="px-3 py-2 rounded bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-700">← رجوع</a>
 
 <div class="mt-4 grid md:grid-cols-3 gap-6">
   <div>
@@ -10,15 +10,15 @@
       <img src="{{ asset('storage/'.$book->cover_image_path) }}" class="rounded shadow">
     @endif
   </div>
-  <div class="md:col-span-2 space-y-2">
+  <div class="md:col-span-2 space-y-2 text-gray-900 dark:text-gray-100">
     <h1 class="text-xl font-bold">{{ $book->title }}</h1>
-    <div class="text-gray-600">ISBN: {{ $book->isbn }}</div>
+    <div class="text-gray-600 dark:text-gray-400">ISBN: {{ $book->isbn }}</div>
     <div>{{ $book->currency }} {{ number_format($book->price,2) }}</div>
     <div>المخزون: {{ $book->stock_qty }}</div>
     <div>التصنيف: {{ optional($book->category)->name }}</div>
     <div>الناشر: {{ optional($book->publisher)->name }}</div>
     <div>المؤلفون: {{ $book->authors->pluck('name')->join(', ') }}</div>
-    <div class="text-gray-700 leading-7 whitespace-pre-line">{{ $book->description }}</div>
+    <div class="text-gray-700 dark:text-gray-300 leading-7 whitespace-pre-line">{{ $book->description }}</div>
 
     <div class="pt-4">
       @can('update',$book)
