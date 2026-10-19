@@ -2,9 +2,14 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+    color-scheme: light;
+}
+
+html.dark {
+    color-scheme: dark;
+}
+
 [x-cloak] {
     display: none;
 }
-
-
-
