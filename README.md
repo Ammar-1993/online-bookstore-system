@@ -2,7 +2,26 @@
 
 A modern, RTL-ready (Arabic) multi-vendor online bookstore built with **Laravel 12**, featuring a rich product catalog with live AJAX search & multi-faceted filtering, wishlist & book comparison, session cart & two-phase checkout, **Stripe** payments (test mode) with webhook handling, RTL invoice PDFs (**mPDF**), email notifications via **Mailpit**, a role-based admin & seller portal (**Admin / Seller / User**) with sales analytics & CSV export, and a clean Tailwind CSS UI.
 
-![Laravel](https://img.shields.io/badge/Laravel-12.x-red) ![PHP](https://img.shields.io/badge/PHP-8.2+-purple) ![License](https://img.shields.io/badge/License-MIT-green)
+![Laravel 12](https://img.shields.io/badge/Laravel-12.x-FF2D20?style=flat-square&logo=laravel&logoColor=white)
+![PHP 8.2+](https://img.shields.io/badge/PHP-8.2%2B%20%7C%208.4-777BB4?style=flat-square&logo=php&logoColor=white)
+![Livewire 3](https://img.shields.io/badge/Livewire-3.6-FB70A9?style=flat-square&logo=livewire&logoColor=white)
+![Jetstream](https://img.shields.io/badge/Jetstream-5.3-FF2D20?style=flat-square&logo=laravel&logoColor=white)
+![Sanctum](https://img.shields.io/badge/Sanctum-4.0-FF2D20?style=flat-square&logo=laravel&logoColor=white)
+![Spatie Permission](https://img.shields.io/badge/Spatie_RBAC-6.21-197593?style=flat-square)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6%2B-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.4-06B6D4?style=flat-square&logo=tailwindcss&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-7.0-646CFF?style=flat-square&logo=vite&logoColor=white)
+![Axios](https://img.shields.io/badge/Axios-1.11-5A29E4?style=flat-square&logo=axios&logoColor=white)
+![MySQL](https://img.shields.io/badge/MySQL-8.0-4479A1?style=flat-square&logo=mysql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-Alpine-DC382D?style=flat-square&logo=redis&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe_SDK-17.5-635BFF?style=flat-square&logo=stripe&logoColor=white)
+![mPDF](https://img.shields.io/badge/mPDF-8.2%20(RTL)-EC1C24?style=flat-square&logo=adobeacrobatreader&logoColor=white)
+![DomPDF](https://img.shields.io/badge/DomPDF-3.1-EC1C24?style=flat-square)
+![Docker](https://img.shields.io/badge/Docker-Laravel_Sail-2496ED?style=flat-square&logo=docker&logoColor=white)
+![Mailpit](https://img.shields.io/badge/Mailpit-SMTP-009688?style=flat-square)
+![PHPUnit](https://img.shields.io/badge/PHPUnit-11.5-3C9CD7?style=flat-square&logo=phpunit&logoColor=white)
+![RTL Arabic](https://img.shields.io/badge/Direction-RTL%20%7C%20Arabic-059669?style=flat-square)
+![License](https://img.shields.io/badge/License-MIT-22C55E?style=flat-square)
 
 ---
 
@@ -108,13 +127,19 @@ A modern, RTL-ready (Arabic) multi-vendor online bookstore built with **Laravel 
 
 ## Tech Stack
 
-- **Backend**: Laravel 12, PHP 8.2+ (Sail runtime uses PHP 8.4)
-- **Auth & Security**: Laravel Jetstream 5.3, Laravel Fortify, Laravel Sanctum 4.0, Spatie Laravel Permission 6.21
-- **Payments**: Stripe PHP SDK (`stripe/stripe-php`)
-- **Database & Cache**: MySQL 8.0, Redis
-- **Frontend**: Blade (RTL), Tailwind CSS, Livewire 3.6, Vite, custom JS plugins (`liveSearch`, `wishlist`, `compare`, `pageLoader`)
-- **Email (local)**: Mailpit
-- **PDF Generation**: mPDF 8.2 (`mpdf/mpdf`) & DomPDF 3.1 (`barryvdh/laravel-dompdf`)
+| Layer / Category | Technologies, Languages & Packages | Purpose in the System |
+| :--- | :--- | :--- |
+| **Languages** | **PHP 8.2+ / 8.4**, **JavaScript (ES6+)**, **SQL**, **HTML5**, **CSS3** | Core server-side logic, interactive client plugins, relational queries, and RTL markup |
+| **Backend & ORM** | **Laravel 12.x**, **Eloquent ORM** | MVC routing, FormRequests, database transactions, row-level locking (`lockForUpdate`), queues, and notifications |
+| **Auth & Security** | **Laravel Jetstream 5.3**, **Laravel Fortify**, **Laravel Sanctum 4.0** | Registration, login, mandatory email verification, 2FA, profile photo management, browser sessions, and API tokens |
+| **Authorization (RBAC)** | **Spatie Laravel Permission 6.21**, **Laravel Policies** | Role/permission management (`Admin`, `Seller`, `User`) + `BookPolicy`, `OrderPolicy`, `ReviewPolicy` |
+| **Frontend & UI** | **Blade (RTL)**, **Livewire 3.6**, **Tailwind CSS 3.4** (`@tailwindcss/forms`, `@tailwindcss/typography`), **Axios 1.11** | Server-driven reactive components, Arabic `dir="rtl"` responsive styling, and AJAX interactions (`liveSearch`, `wishlist`, `compare`, `pageLoader`) |
+| **Build & Bundling** | **Vite 7.0**, **PostCSS 8.4**, **Autoprefixer**, **`laravel-vite-plugin 2.0`**, **Concurrently 9.0** | Fast HMR asset bundling and parallel dev workflow orchestration (`composer run dev`) |
+| **Database & Caching** | **MySQL 8.0**, **Redis (Alpine)** | Relational storage (`online_bookstore_db`), session cart/compare state, 5-min analytics cache, and 24-hour Stripe webhook event deduplication |
+| **Payments** | **Stripe PHP SDK 17.5** (`stripe/stripe-php`), **Stripe Elements / CLI** | Idempotent `PaymentIntent` creation, signature-verified webhook processing, and automated customer refunds |
+| **PDF & Data Export** | **mPDF 8.2** (`mpdf/mpdf`), **DomPDF 3.1** (`barryvdh/laravel-dompdf`), **Streamed CSV** | Arabic/RTL A4 PDF invoice generation (`dejavusans`) and UTF-8 BOM CSV analytics export |
+| **Email & Messaging** | **Laravel Mail & Notifications**, **Mailpit** (Local SMTP) | Transactional emails (Order Placed, Paid + PDF Invoice, Shipped + Tracking Link, Cancelled, Status Updated) |
+| **DevOps & Testing** | **Docker & Laravel Sail 1.41**, **PHPUnit 11.5**, **Laravel Pint 1.13**, **Laravel Pail 1.2**, **Faker** | Containerized local environment, automated feature/unit testing, code formatting, and real-time log tailing |
 
 ---
 
