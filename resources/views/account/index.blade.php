@@ -4,11 +4,13 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>لوحة حسابي - المتجر الإلكتروني للكتب</title>
+    @include('partials.theme-init')
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 
-<body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100">
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 antialiased">
     {{-- الشريط العلوي (موحّد الأسلوب مع الواجهة العامة) --}}
     <header
         class="sticky top-0 z-40 backdrop-blur bg-white/85 dark:bg-gray-900/80 border-b border-black/5 dark:border-white/10">
@@ -38,15 +40,19 @@
                     </button>
                 </nav>
 
-                {{-- قائمة بسيطة للمحمول --}}
-                <div class="md:hidden">
-                    <button id="acc-burger" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10"
-                        aria-label="القائمة">
-                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
-                            <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2"
-                                stroke-linecap="round" />
-                        </svg>
-                    </button>
+                <div class="flex items-center gap-2">
+                    @include('partials.theme-toggle-button')
+
+                    {{-- قائمة بسيطة للمحمول --}}
+                    <div class="md:hidden">
+                        <button id="acc-burger" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-white/10"
+                            aria-label="القائمة">
+                            <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none">
+                                <path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -55,7 +61,7 @@
                     <a href="{{ route('home') }}"
                         class="px-2 py-1.5 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-white/10">الرئيسية</a>
                     <a href="{{ route('orders.index') }}"
-                        class="px-2 py-1.5 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg:white/10">طلباتي</a>
+                        class="px-2 py-1.5 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-white/10">طلباتي</a>
                     <button type="button" data-open-profile
                         class="text-start px-2 py-1.5 rounded-lg text-sm hover:bg-gray-100 dark:hover:bg-white/10">تحديث
                         الملف الشخصي</button>
@@ -93,15 +99,15 @@
                 <div class="text-sm text-gray-600 dark:text-gray-300 mb-1">إجمالي الطلبات</div>
                 <div class="text-2xl font-semibold tabular-nums">{{ number_format($totalOrders) }}</div>
             </div>
-            <div class="rounded-2xl bg-white dark:bg-gray-900 shadow ring-1 ring-black/5 dark:ring:white/10 p-5">
+            <div class="rounded-2xl bg-white dark:bg-gray-900 shadow ring-1 ring-black/5 dark:ring-white/10 p-5">
                 <div class="text-sm text-gray-600 dark:text-gray-300 mb-1">طلبات نشِطة</div>
                 <div class="text-2xl font-semibold tabular-nums">{{ number_format($activeOrders) }}</div>
             </div>
-            <div class="rounded-2xl bg-white dark:bg-gray-900 shadow ring-1 ring-black/5 dark:ring:white/10 p-5">
+            <div class="rounded-2xl bg-white dark:bg-gray-900 shadow ring-1 ring-black/5 dark:ring-white/10 p-5">
                 <div class="text-sm text-gray-600 dark:text-gray-300 mb-1">طلبات غير مدفوعة</div>
                 <div class="text-2xl font-semibold tabular-nums">{{ number_format($unpaidOrders) }}</div>
             </div>
-            <div class="rounded-2xl bg-white dark:bg-gray-900 shadow ring-1 ring-black/5 dark:ring:white/10 p-5">
+            <div class="rounded-2xl bg-white dark:bg-gray-900 shadow ring-1 ring-black/5 dark:ring-white/10 p-5">
                 <div class="text-sm text-gray-600 dark:text-gray-300 mb-1">إجمالي المدفوع</div>
                 <div class="text-2xl font-semibold tabular-nums">
                     {{ number_format($totalPaidAmount, 2) }} {{ config('app.currency', 'USD') }}
@@ -110,7 +116,7 @@
         </div>
 
         {{-- بيانات أساسية --}}
-        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow ring-1 ring-black/5 dark:ring:white/10 p-5 mb-8">
+        <div class="bg-white dark:bg-gray-900 rounded-2xl shadow ring-1 ring-black/5 dark:ring-white/10 p-5 mb-8">
             <div class="font-display font-semibold mb-3">بياناتي</div>
             <div class="grid sm:grid-cols-2 gap-4 text-sm">
                 <div>
@@ -152,7 +158,7 @@
         @endphp
 
         <div
-            class="bg-white dark:bg-gray-900 rounded-2xl shadow ring-1 ring-black/5 dark:ring:white/10 overflow-x-auto">
+            class="bg-white dark:bg-gray-900 rounded-2xl shadow ring-1 ring-black/5 dark:ring-white/10 overflow-x-auto">
             <div class="flex items-center justify-between p-5">
                 <div class="font-display font-semibold">آخر الطلبات</div>
                 <a href="{{ route('orders.index') }}"

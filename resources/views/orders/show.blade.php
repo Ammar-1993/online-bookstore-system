@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl">تفاصيل الطلب #{{ $order->id }}</h2>
+        <h2 class="font-semibold text-xl text-gray-900 dark:text-gray-100">تفاصيل الطلب #{{ $order->id }}</h2>
     </x-slot>
 
     @php
@@ -8,17 +8,17 @@
         $status = $order->status ?? 'pending';
 
         $payClass = [
-            'paid' => 'bg-emerald-100 text-emerald-700',
-            'refunded' => 'bg-amber-100 text-amber-700',
-            'unpaid' => 'bg-gray-100 text-gray-700',
-        ][$payment] ?? 'bg-gray-100 text-gray-700';
+            'paid' => 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/15 dark:text-emerald-300',
+            'refunded' => 'bg-amber-100 text-amber-700 dark:bg-amber-500/15 dark:text-amber-300',
+            'unpaid' => 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+        ][$payment] ?? 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
 
         $statusClass = [
-            'pending' => 'bg-gray-100 text-gray-700',
-            'processing' => 'bg-blue-100 text-blue-700',
-            'shipped' => 'bg-indigo-100 text-indigo-700',
-            'cancelled' => 'bg-rose-100 text-rose-700',
-        ][$status] ?? 'bg-gray-100 text-gray-700';
+            'pending' => 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+            'processing' => 'bg-blue-100 text-blue-700 dark:bg-blue-500/15 dark:text-blue-300',
+            'shipped' => 'bg-indigo-100 text-indigo-700 dark:bg-indigo-500/15 dark:text-indigo-300',
+            'cancelled' => 'bg-rose-100 text-rose-700 dark:bg-rose-500/15 dark:text-rose-300',
+        ][$status] ?? 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300';
 
         $isPayable = method_exists($order, 'isPayable')
             ? $order->isPayable()
@@ -34,11 +34,11 @@
 
     <div class="container mx-auto p-4 space-y-4">
 
-        <div class="bg-white shadow rounded-2xl p-4">
+        <div class="bg-white dark:bg-gray-900 shadow ring-1 ring-black/5 dark:ring-white/10 rounded-2xl p-4">
             <div class="flex flex-wrap items-center justify-between gap-2">
                 <div>
-                    <h1 class="text-xl font-bold">الطلب #{{ $order->id }}</h1>
-                    <div class="text-gray-600 mt-1 text-sm">
+                    <h1 class="text-xl font-bold text-gray-900 dark:text-gray-100">الطلب #{{ $order->id }}</h1>
+                    <div class="text-gray-600 dark:text-gray-400 mt-1 text-sm">
                         بتاريخ: {{ $order->created_at->format('Y-m-d H:i') }}
                     </div>
                 </div>
@@ -49,37 +49,37 @@
             </div>
         </div>
 
-        <div class="bg-white shadow rounded-2xl p-4">
-            <h2 class="font-semibold mb-3">العناصر</h2>
-            <div class="divide-y">
+        <div class="bg-white dark:bg-gray-900 shadow ring-1 ring-black/5 dark:ring-white/10 rounded-2xl p-4">
+            <h2 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">العناصر</h2>
+            <div class="divide-y divide-gray-200 dark:divide-gray-800">
                 @foreach($order->items as $item)
                     <div class="py-3 flex items-center justify-between">
                         <div>
-                            <div class="font-medium">{{ $item->book->title ?? 'كتاب' }}</div>
-                            <div class="text-xs text-gray-500">
+                            <div class="font-medium text-gray-900 dark:text-gray-100">{{ $item->book->title ?? 'كتاب' }}</div>
+                            <div class="text-xs text-gray-500 dark:text-gray-400">
                                 الكمية: {{ $item->qty }} · السعر: {{ number_format($item->unit_price, 2) }}
                             </div>
                         </div>
-                        <div class="font-semibold">{{ number_format($item->total_price, 2) }}</div>
+                        <div class="font-semibold text-gray-900 dark:text-gray-100 tabular-nums">{{ number_format($item->total_price, 2) }}</div>
                     </div>
                 @endforeach
             </div>
-            <div class="mt-4 text-right font-bold">
+            <div class="mt-4 text-right font-bold text-gray-900 dark:text-gray-100 tabular-nums">
                 الإجمالي: {{ number_format($total, 2) }} {{ $currency }}
             </div>
         </div>
 
         {{-- ✅ تفاصيل الشحن للعميل --}}
         @if($order->status === 'shipped' || $order->tracking_number)
-            <div class="bg-white shadow rounded-2xl p-4">
-                <h2 class="font-semibold mb-3">تفاصيل الشحن</h2>
-                <div class="text-sm space-y-1">
+            <div class="bg-white dark:bg-gray-900 shadow ring-1 ring-black/5 dark:ring-white/10 rounded-2xl p-4">
+                <h2 class="font-semibold text-gray-900 dark:text-gray-100 mb-3">تفاصيل الشحن</h2>
+                <div class="text-sm text-gray-700 dark:text-gray-300 space-y-1">
                     <div>شركة الشحن: <strong>{{ $order->shipping_carrier ?? '—' }}</strong></div>
                     <div>
                         رقم التتبع:
                         <strong>
                             @if($order->tracking_url)
-                                <a class="text-indigo-600 hover:underline" target="_blank" rel="noopener"
+                                <a class="text-indigo-600 dark:text-indigo-400 hover:underline" target="_blank" rel="noopener"
                                     href="{{ $order->tracking_url }}">{{ $order->tracking_number }}</a>
                             @else
                                 {{ $order->tracking_number ?? '—' }}
@@ -92,7 +92,7 @@
         @endif
 
 
-        <div class="bg-white shadow rounded-2xl p-4 flex flex-wrap items-center gap-2">
+        <div class="bg-white dark:bg-gray-900 shadow ring-1 ring-black/5 dark:ring-white/10 rounded-2xl p-4 flex flex-wrap items-center gap-2">
             @if($isPayable)
                 <a href="{{ route('payments.stripe.pay', $order) }}"
                     class="inline-flex items-center justify-center px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700">
@@ -118,10 +118,10 @@
             @endif
 
             <a href="{{ route('orders.invoice', $order) }}"
-                class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">عرض الفاتورة</a>
+                class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100">عرض الفاتورة</a>
 
             <a href="{{ route('orders.invoice.pdf', $order) }}"
-                class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200">تحميل PDF</a>
+                class="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-800 dark:text-gray-100">تحميل PDF</a>
         </div>
 
     </div>

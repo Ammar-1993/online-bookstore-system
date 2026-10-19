@@ -3,26 +3,31 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>الدفع عبر Stripe</title>
+  @include('partials.theme-init')
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   <script src="https://js.stripe.com/v3/"></script>
 </head>
-<body class="bg-gray-50 text-gray-900">
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 antialiased">
   <div class="max-w-xl mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-4">
-      الدفع للطلب {{ method_exists($order,'getNumberAttribute') ? $order->number : ('#'.$order->id) }}
-    </h1>
+    <div class="flex items-center justify-between mb-4">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">
+        الدفع للطلب {{ method_exists($order,'getNumberAttribute') ? $order->number : ('#'.$order->id) }}
+      </h1>
+      @include('partials.theme-toggle-button')
+    </div>
 
-    <div class="bg-white p-4 rounded-2xl shadow mb-4">
-      <div class="text-sm text-gray-600">الإجمالي</div>
-      <div class="text-xl font-bold">
+    <div class="bg-white dark:bg-gray-900 p-4 rounded-2xl shadow ring-1 ring-black/5 dark:ring-white/10 mb-4">
+      <div class="text-sm text-gray-600 dark:text-gray-400">الإجمالي</div>
+      <div class="text-xl font-bold text-gray-900 dark:text-gray-100 tabular-nums">
         {{ number_format(method_exists($order,'computedTotal') ? $order->computedTotal() : $order->items->sum('total_price'), 2) }}
         {{ $order->currency ?: config('app.currency','USD') }}
       </div>
     </div>
 
-    <form id="payment-form" class="bg-white p-4 rounded-2xl shadow space-y-3">
-      <div id="card-element" class="p-3 border rounded-xl"></div>
+    <form id="payment-form" class="bg-white dark:bg-gray-900 p-4 rounded-2xl shadow ring-1 ring-black/5 dark:ring-white/10 space-y-3">
+      <div id="card-element" class="p-3 border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-950 rounded-xl"></div>
       <button id="pay-btn" type="submit"
               class="px-4 py-2 rounded-xl bg-emerald-600 text-white hover:bg-emerald-700 transition disabled:opacity-60">
         ادفع الآن
@@ -31,7 +36,7 @@
     </form>
 
     <div class="mt-4">
-      <a href="{{ route('orders.show', $order) }}" class="text-blue-600 hover:underline">العودة للطلب</a>
+      <a href="{{ route('orders.show', $order) }}" class="text-blue-600 dark:text-indigo-400 hover:underline">العودة للطلب</a>
     </div>
   </div>
 
@@ -39,8 +44,27 @@
   document.addEventListener('DOMContentLoaded', () => {
     const stripe = Stripe(@json($publishableKey));
     const elements = stripe.elements();
-    const card = elements.create('card', { hidePostalCode: true });
+    const getCardStyle = () => {
+      const isDark = document.documentElement.classList.contains('dark');
+      return {
+        base: {
+          color: isDark ? '#f3f4f6' : '#111827',
+          iconColor: isDark ? '#9ca3af' : '#4b5563',
+          '::placeholder': {
+            color: isDark ? '#6b7280' : '#9ca3af',
+          },
+        },
+        invalid: {
+          color: '#ef4444',
+          iconColor: '#ef4444',
+        },
+      };
+    };
+    const card = elements.create('card', { hidePostalCode: true, style: getCardStyle() });
     card.mount('#card-element');
+    window.addEventListener('theme-changed', () => {
+      card.update({ style: getCardStyle() });
+    });
 
     const form = document.getElementById('payment-form');
     const btn  = document.getElementById('pay-btn');
@@ -48,7 +72,7 @@
 
     function showMsg(text, ok = false){
       msg.textContent = text || '';
-      msg.className   = 'text-sm mt-2 ' + (ok ? 'text-emerald-700' : 'text-red-600');
+      msg.className   = 'text-sm mt-2 ' + (ok ? 'text-emerald-700 dark:text-emerald-400' : 'text-red-600 dark:text-red-400');
     }
     function setLoading(v){
       btn.disabled = v;
