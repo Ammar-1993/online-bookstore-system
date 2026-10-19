@@ -8,7 +8,7 @@
   {{-- رأس الصفحة --}}
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 grid place-items-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200/70">
+      <div class="w-10 h-10 grid place-items-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-200/70 dark:bg-indigo-500/10 dark:text-indigo-400 dark:ring-indigo-500/20">
         {{-- book icon --}}
         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M5 4h11a3 3 0 0 1 3 3v13H8a3 3 0 0 1-3-3V4z" stroke="currentColor" stroke-width="2"/>
@@ -16,7 +16,7 @@
         </svg>
       </div>
       <div>
-        <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-black-100">إضافة كتاب</h1>
+        <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-gray-100">إضافة كتاب</h1>
         <p class="text-sm text-gray-500 dark:text-gray-400">املأ البيانات التالية ثم اضغط «حفظ».</p>
       </div>
     </div>

@@ -38,7 +38,7 @@
       };
     @endphp
 
-    <div class="flash-item pointer-events-auto relative w-full sm:w-auto max-w-[92vw] sm:max-w-md rounded-2xl border border-black/5 shadow-lg ring-1 {{ $palette['ring'] }} bg-white/95 dark:bg-zinc-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/75"
+    <div class="flash-item pointer-events-auto relative w-full sm:w-auto max-w-[92vw] sm:max-w-md rounded-2xl border border-black/5 dark:border-white/10 shadow-lg ring-1 {{ $palette['ring'] }} bg-white/95 dark:bg-zinc-900/95 backdrop-blur supports-[backdrop-filter]:bg-white/75 dark:supports-[backdrop-filter]:bg-zinc-900/75"
          data-type="{{ $type }}" data-timeout="{{ (int)$duration }}" data-server-rendered="1" role="status" aria-live="polite">
       <div class="absolute left-0 top-0 h-full w-1.5 rounded-l-2xl {{ $palette['bg'] }}"></div>
 
@@ -262,7 +262,7 @@
     if (!message) return;
     const t = tone(type);
     const wrap = document.createElement('div');
-    wrap.className = `flash-item pointer-events-auto relative w-full sm:w-auto max-w-[92vw] sm:max-w-md rounded-2xl border border-black/5 shadow-lg ring-1 ${t.ring} bg-white/95 dark:bg-zinc-900/95 backdrop-blur`;
+    wrap.className = `flash-item pointer-events-auto relative w-full sm:w-auto max-w-[92vw] sm:max-w-md rounded-2xl border border-black/5 dark:border-white/10 shadow-lg ring-1 ${t.ring} bg-white/95 dark:bg-zinc-900/95 backdrop-blur`;
     wrap.setAttribute('data-type', type);
     wrap.setAttribute('role', 'status');
     wrap.style.setProperty('--dur', duration + 'ms');

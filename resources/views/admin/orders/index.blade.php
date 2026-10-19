@@ -71,9 +71,9 @@
     {{-- العنوان + العدّاد --}}
     <div class="flex items-center justify-between">
       <div class="flex flex-col gap-1">
-        <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-black-100">الطلبات</h1>
+        <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-gray-100">الطلبات</h1>
       </div>
-      <div class="text-sm text-gray-700 dark:text-black-300">
+      <div class="text-sm text-gray-700 dark:text-gray-300">
         إجمالي النتائج:
         <span
           class="tabular-nums font-semibold px-2 py-0.5 rounded-md bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100">

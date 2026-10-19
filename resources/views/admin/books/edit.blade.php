@@ -8,14 +8,14 @@
   {{-- رأس الصفحة --}}
   <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
     <div class="flex items-center gap-3">
-      <div class="w-10 h-10 grid place-items-center rounded-xl bg-amber-50 text-amber-600 ring-1 ring-amber-200/70">
+      <div class="w-10 h-10 grid place-items-center rounded-xl bg-amber-50 text-amber-600 ring-1 ring-amber-200/70 dark:bg-amber-500/10 dark:text-amber-400 dark:ring-amber-500/20">
         {{-- edit/pencil icon --}}
         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
           <path d="M4 21h4l11-11a2.828 2.828 0 1 0-4-4L4 17v4Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
       <div>
-        <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-black-100">تعديل كتاب</h1>
+        <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-gray-100">تعديل كتاب</h1>
         <p class="text-sm text-gray-500 dark:text-gray-400">
           حدّث بيانات «{{ \Illuminate\Support\Str::limit($book->title, 40, '…') }}».
         </p>

@@ -23,7 +23,7 @@
 
 <div class="mb-6">
   <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
-    <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-black-100">التصنيفات</h1>
+    <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-gray-100">التصنيفات</h1>
 
     <div class="flex items-center gap-2 w-full lg:w-auto">
       {{-- بحث --}}

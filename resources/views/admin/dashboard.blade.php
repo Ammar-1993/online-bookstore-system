@@ -8,7 +8,7 @@
     {{-- رأس صفحة أنيق + إجراءات سريعة --}}
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
       <div>
-        <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-black-100">أهلًا بك في لوحة التحكم</h1>
+        <h1 class="text-2xl font-display font-semibold text-gray-900 dark:text-gray-100">أهلًا بك في لوحة التحكم</h1>
         <p class="text-sm text-gray-600 dark:text-gray-300 mt-1">نظرة عامة سريعة على متجرك.</p>
       </div>
 
