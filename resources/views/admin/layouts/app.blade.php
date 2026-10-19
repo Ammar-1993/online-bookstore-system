@@ -5,26 +5,26 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>@yield('title', 'المتجر الإلكتروني للكتب') - Online Bookstore</title>
+  @include('partials.theme-init')
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   @livewireStyles
 
 </head>
 
-<body class="bg-gray-50 text-gray-900">
+<body class="bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 antialiased selection:bg-indigo-600 selection:text-white">
 
   {{-- شريط علوي --}}
-  <header class="bg-white border-b">
-    @php
-      $u = auth()->user();
-      $isAdmin = $u?->hasRole('Admin');
-      $isSeller = $u?->hasRole('Seller');
-      $is = fn(string $pat) => request()->routeIs($pat);
-      $active = 'text-indigo-700 dark:text-indigo-300 bg-indigo-50/70 dark:bg-white/5 ring-1 ring-inset ring-indigo-600/20';
-      $base = 'inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50/70 dark:hover:bg-white/5 transition';
-    @endphp
+  @php
+    $u = auth()->user();
+    $isAdmin = $u?->hasRole('Admin');
+    $isSeller = $u?->hasRole('Seller');
+    $is = fn(string $pat) => request()->routeIs($pat);
+    $active = 'text-indigo-700 dark:text-indigo-300 bg-indigo-50/70 dark:bg-white/5 ring-1 ring-inset ring-indigo-600/20';
+    $base = 'inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-sm text-gray-700 dark:text-gray-200 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50/70 dark:hover:bg-white/5 transition';
+  @endphp
 
-    <header
-      class="sticky top-0 z-40 backdrop-blur bg-white/80 dark:bg-gray-900/70 border-b border-black/5 dark:border-white/10">
+  <header
+    class="sticky top-0 z-40 backdrop-blur bg-white/80 dark:bg-gray-900/70 border-b border-black/5 dark:border-white/10">
       <div class="max-w-7xl mx-auto px-4">
         <div class="h-14 flex items-center justify-between gap-3">
           {{-- Brand + Burger --}}
@@ -239,16 +239,7 @@
       document.addEventListener('click', (e) => {
         if (!ubtn?.contains(e.target) && !umenu?.contains(e.target)) umenu?.classList.add('hidden');
       });
-
-      // theme toggle (مع حفظ التفضيل)
-      document.getElementById('theme-toggle')?.addEventListener('click', () => {
-        const root = document.documentElement;
-        const isDark = root.classList.toggle('dark');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      });
     </script>
-
-  </header>
 
   {{-- محتوى الصفحة --}}
   <main class="max-w-7xl mx-auto px-4 py-6">

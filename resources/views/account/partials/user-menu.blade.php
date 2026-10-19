@@ -40,14 +40,14 @@
     @endif
 
     @if ($isAdmin && Route::has('admin.dashboard'))
-      <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg:white/10 text-gray-800 dark:text-gray-100" role="menuitem" data-ripple>
+      <a href="{{ route('admin.dashboard') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-gray-800 dark:text-gray-100" role="menuitem" data-ripple>
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none"><path d="M3 13h8V3H3v10Zm10 8h8V3h-8v18ZM3 21h8v-6H3v6Z" stroke="currentColor" stroke-width="2"/></svg>
         لوحة الإدارة
       </a>
     @endif
 
     @if (Route::has('orders.index'))
-      <a href="{{ route('orders.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg:white/10 text-gray-800 dark:text-gray-100" role="menuitem" data-ripple>
+      <a href="{{ route('orders.index') }}" class="flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-gray-800 dark:text-gray-100" role="menuitem" data-ripple>
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none"><path d="M3 6h18M6 6l1.5 12A2 2 0 0 0 9.5 20h5a2 2 0 0 0 2-1.7L18 6M10 10v6M14 10v6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
         طلباتي
       </a>
@@ -58,7 +58,7 @@
     {{-- خروج --}}
     <form method="POST" action="{{ route('logout') }}" class="p-2" role="none">
       @csrf
-      <button type="submit" class="w-full text-start flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg:white/10 text-rose-600" role="menuitem" data-ripple data-loader>
+      <button type="submit" class="w-full text-start flex items-center gap-2 px-3 py-2 text-sm rounded-lg hover:bg-gray-100 dark:hover:bg-white/10 text-rose-600" role="menuitem" data-ripple data-loader>
         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none"><path d="M15 17l5-5-5-5M20 12H9" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 21H6a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h6" stroke="currentColor" stroke-width="2"/></svg>
         تسجيل الخروج
       </button>

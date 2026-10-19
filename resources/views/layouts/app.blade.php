@@ -15,6 +15,9 @@
   <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
   <link href="https://fonts.bunny.net/css?family=figtree:400,500,600&display=swap" rel="stylesheet" />
 
+  {{-- Theme Initialization (FOUC prevention) --}}
+  @include('partials.theme-init')
+
   {{-- Vite / Livewire --}}
   @vite(['resources/css/app.css', 'resources/js/app.js'])
   @livewireStyles
@@ -143,7 +146,7 @@
 
           {{-- رابط السلة --}}
           <a href="{{ route('cart.index') }}"
-            class="relative inline-flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg白/10"
+            class="relative inline-flex items-center gap-2 px-2 py-1.5 rounded-xl hover:bg-gray-100 dark:hover:bg-white/10"
             data-ripple data-loader aria-label="السلة" title="السلة">
             <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M6 6h15l-1.5 9h-12L5 3H2" stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -267,26 +270,8 @@
   {{-- محمّل الصفحة الدائري الموحد --}}
   <x-page-loader />
 
-  {{-- سكربتات صغيرة: القائمة/الوضع --}}
+  {{-- سكربتات صغيرة: القائمة --}}
   <script>
-    // تفضيل السمة
-    (() => {
-      const root = document.documentElement;
-      const saved = localStorage.getItem('theme');
-      if (saved) {
-        root.classList.toggle('dark', saved === 'dark');
-      } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        root.classList.toggle('dark', prefersDark);
-      }
-      const btn = document.getElementById('theme-toggle');
-      btn?.addEventListener('click', () => {
-        const isDark = root.classList.toggle('dark');
-        btn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
-        localStorage.setItem('theme', isDark ? 'dark' : 'light');
-      });
-    })();
-
     // قائمة المستخدم (تحسين a11y: aria-expanded + الإغلاق بالمحيط وEscape)
     (() => {
       const btn = document.getElementById('top-user-btn');
